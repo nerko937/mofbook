@@ -1,12 +1,14 @@
 import { View } from 'react-native';
 import Todo from '../components/todo'
 
+const mockTodos = [
+    "chleb", "masło", "mleko"
+]
 
 const Home = () => {
     return (
         <View>
-            <Todo />
-            <Todo />
+            {mockTodos.map(todo => (<Todo content={todo}/>))}
         </View>
     )
 }

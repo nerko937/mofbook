@@ -1,9 +1,12 @@
 import { View, Text } from 'react-native';
 
+type TodoProps = {
+    content: string;
+}
 
-const Todo = () => {
+const Todo = (props: TodoProps) => {
     return (
-        <View><Text>test</Text></View>
+        <View><Text>{props.content}</Text></View>
     )
 }
 
