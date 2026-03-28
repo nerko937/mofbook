@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../theme';
 
 type TodoProps = {
@@ -7,11 +7,19 @@ type TodoProps = {
 
 const Todo = (props: TodoProps) => {
   return (
-    <View style={ { backgroundColor: theme.colors.background } }>
-      <Text style={{color: theme.colors.text}}>{ props.content }</Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>{ props.content }</Text>
     </View>
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: theme.colors.background,
+  },
+  text: {
+    color: theme.colors.text,
+  },
+});
 
 export default Todo;
