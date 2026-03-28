@@ -8,7 +8,7 @@ const mockTodos = [
 const Home = () => {
   return (
     <View>
-      { mockTodos.map(todo => (<Todo content={ todo } />)) }
+      { mockTodos.map(todo => (<Todo key={ todo } content={ todo } />)) }
     </View>
   );
 };
