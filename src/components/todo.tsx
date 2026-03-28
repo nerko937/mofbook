@@ -7,8 +7,8 @@ type TodoProps = {
 const Todo = (props: TodoProps) => {
   return (
     <View><Text>{ props.content }</Text></View>
-  )
-}
+  );
+};
 
 
-export default Todo
+export default Todo;
