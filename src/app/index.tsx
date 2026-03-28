@@ -4,7 +4,7 @@ import Home from "../navigation/home"
 export default function Index() {
   return (
     <View>
-        <Home/>
+      <Home />
     </View>
   );
 }
