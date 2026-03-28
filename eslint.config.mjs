@@ -20,6 +20,18 @@ export default defineConfig([
       },
     },
     rules: {
+      'max-len': [
+        'error',
+        {
+          code: 88,
+          tabWidth: 2,
+          ignoreUrls: true,
+          ignoreStrings: true,
+          ignoreTemplateLiterals: true,
+          ignoreRegExpLiterals: true,
+          ignoreComments: false,
+        },
+      ],
       '@stylistic/indent': ['error', 2],
       '@stylistic/object-curly-spacing': ['error', 'always'],
       'react/jsx-tag-spacing': [
