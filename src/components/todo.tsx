@@ -1,4 +1,5 @@
 import { View, Text } from 'react-native';
+import { theme } from '../theme';
 
 type TodoProps = {
   content: string;
@@ -6,7 +7,9 @@ type TodoProps = {
 
 const Todo = (props: TodoProps) => {
   return (
-    <View><Text>{ props.content }</Text></View>
+    <View style={ { backgroundColor: theme.colors.background } }>
+      <Text style={{color: theme.colors.text}}>{ props.content }</Text>
+    </View>
   );
 };
 
