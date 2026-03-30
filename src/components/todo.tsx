@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '../theme';
 
 type TodoProps = {
@@ -6,35 +6,69 @@ type TodoProps = {
 }
 
 const Todo = (props: TodoProps) => {
+  const handleCheckboxPress = () => {
+    // Checkbox press logic will go here
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{ props.content }</Text>
+      <TouchableOpacity
+        style={styles.checkboxTextContainer}
+        onPress={handleCheckboxPress}
+      >
+        <View style={styles.checkbox}>
+          <View style={styles.checkboxInner} />
+        </View>
+        <Text style={styles.text}>{ props.content }</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.trashButton}>
+        <Text style={styles.trashIcon}>×</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.surface0,
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 6,
-    marginHorizontal: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.mauve,
-    shadowColor: theme.colors.crust,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkboxTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: theme.colors.overlay1,
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 2,
   },
   text: {
     color: theme.colors.text,
     fontSize: 16,
     lineHeight: 24,
+    flex: 1,
+  },
+  trashButton: {
+    marginLeft: 12,
+    padding: 4,
+  },
+  trashIcon: {
+    fontSize: 24,
+    color: theme.colors.overlay1,
+    fontWeight: '300',
   },
 });
 
