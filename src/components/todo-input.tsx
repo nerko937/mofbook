@@ -1,5 +1,11 @@
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { useState } from 'react';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+} from 'react-native';
+import { useState, useRef } from 'react';
 import { theme } from '../theme';
 
 type TodoInputProps = {
@@ -8,31 +14,35 @@ type TodoInputProps = {
 
 const TodoInput = (props: TodoInputProps) => {
   const [text, setText] = useState('');
+  const inputRef = useRef<TextInput>(null);
 
   const handleAdd = () => {
     if (text.trim()) {
       props.onAdd(text.trim());
       setText('');
+      inputRef.current?.focus();
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={ styles.container }>
       <TextInput
-        style={styles.input}
+        ref={ inputRef }
+        style={ styles.input }
         placeholder="Add new todo..."
-        placeholderTextColor={theme.colors.overlay1}
-        value={text}
-        onChangeText={setText}
-        onSubmitEditing={handleAdd}
+        placeholderTextColor={ theme.colors.overlay1 }
+        value={ text }
+        onChangeText={ setText }
+        onSubmitEditing={ handleAdd }
         returnKeyType="done"
+        submitBehavior='submit'
       />
       <TouchableOpacity
-        style={styles.button}
-        onPress={handleAdd}
-        disabled={!text.trim()}
+        style={ styles.button }
+        onPress={ handleAdd }
+        disabled={ !text.trim() }
       >
-        <Text style={[styles.buttonText, !text.trim() && styles.buttonTextDisabled]}>
+        <Text style={ [styles.buttonText, !text.trim() && styles.buttonTextDisabled] }>
           Add
         </Text>
       </TouchableOpacity>
