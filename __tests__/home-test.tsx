@@ -52,4 +52,51 @@ describe('Home', () => {
     const deleteButtons = screen.queryAllByText('×');
     expect(deleteButtons).toHaveLength(0);
   });
+
+  it('toggles checkbox and applies strikethrough when checked', () => {
+    renderHome();
+    
+    const input = screen.getByPlaceholderText('Add new todo...');
+    const addButton = screen.getByText('Add');
+    
+    fireEvent.changeText(input, 'Test todo');
+    fireEvent.press(addButton);
+    
+    const todoText = screen.getByText('Test todo');
+    const checkbox = screen.getByRole('checkbox');
+    
+    let styles = Array.isArray(todoText.props.style)
+      ? todoText.props.style.flat()
+      : [todoText.props.style];
+    
+    let hasStrikethrough = styles.some(
+      (style: any) => style && style.textDecorationLine === 'line-through'
+    );
+    expect(hasStrikethrough).toBe(false);
+    expect(checkbox.props.accessibilityState.checked).toBe(false);
+    
+    fireEvent.press(checkbox);
+    
+    styles = Array.isArray(todoText.props.style)
+      ? todoText.props.style.flat()
+      : [todoText.props.style];
+    
+    hasStrikethrough = styles.some(
+      (style: any) => style && style.textDecorationLine === 'line-through'
+    );
+    expect(hasStrikethrough).toBe(true);
+    expect(checkbox.props.accessibilityState.checked).toBe(true);
+    
+    fireEvent.press(checkbox);
+    
+    styles = Array.isArray(todoText.props.style)
+      ? todoText.props.style.flat()
+      : [todoText.props.style];
+    
+    hasStrikethrough = styles.some(
+      (style: any) => style && style.textDecorationLine === 'line-through'
+    );
+    expect(hasStrikethrough).toBe(false);
+    expect(checkbox.props.accessibilityState.checked).toBe(false);
+  });
 });

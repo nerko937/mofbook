@@ -11,16 +11,27 @@ import Todo from '../components/todo';
 import TodoInput from '../components/todo-input';
 import { theme } from '../theme';
 
+type TodoItem = {
+  content: string;
+  checked: boolean;
+}
+
 const Home = () => {
-  const [todos, setTodos] = useState<string[]>([]);
+  const [todos, setTodos] = useState<TodoItem[]>([]);
   const insets = useSafeAreaInsets();
 
   const handleAddTodo = (content: string) => {
-    setTodos([...todos, content]);
+    setTodos([...todos, { content, checked: false }]);
   };
 
   const handleDeleteTodo = (index: number) => {
     setTodos(todos.filter((_, i) => i !== index));
+  };
+
+  const handleToggleCheck = (index: number) => {
+    setTodos(todos.map((todo, i) =>
+      i === index ? { ...todo, checked: !todo.checked } : todo
+    ));
   };
 
   return (
@@ -36,8 +47,10 @@ const Home = () => {
       >
         { todos.map((todo, index) => (
           <Todo
-            key={ `${todo}-${index}` }
-            content={ todo }
+            key={ index }
+            content={ todo.content }
+            checked={ todo.checked }
+            onToggleCheck={ () => handleToggleCheck(index) }
             onDelete={ () => handleDeleteTodo(index) }
           />
         )) }

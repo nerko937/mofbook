@@ -3,12 +3,14 @@ import { theme } from '../theme';
 
 type TodoProps = {
   content: string;
+  checked: boolean;
+  onToggleCheck: () => void;
   onDelete: () => void;
 }
 
 const Todo = (props: TodoProps) => {
   const handleCheckboxPress = () => {
-    // Checkbox press logic will go here
+    props.onToggleCheck();
   };
 
   return (
@@ -16,11 +18,15 @@ const Todo = (props: TodoProps) => {
       <TouchableOpacity
         style={ styles.checkboxTextContainer }
         onPress={ handleCheckboxPress }
+        accessibilityRole="checkbox"
+        accessibilityState={ { checked: props.checked } }
       >
-        <View style={ styles.checkbox }>
-          <View style={ styles.checkboxInner } />
+        <View style={ [styles.checkbox, props.checked && styles.checkboxChecked] }>
+          { props.checked && <Text style={ styles.checkmark }>✓</Text> }
         </View>
-        <Text style={ styles.text }>{ props.content }</Text>
+        <Text style={ [styles.text, props.checked && styles.textChecked] }>
+          { props.content }
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity style={ styles.trashButton } onPress={ props.onDelete }>
         <Text style={ styles.trashIcon }>×</Text>
@@ -51,16 +57,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  checkboxChecked: {
+    backgroundColor: theme.colors.overlay1,
+    borderColor: theme.colors.overlay1,
+  },
+  checkmark: {
+    color: theme.colors.background,
+    fontSize: 14,
+    fontWeight: 'bold',
+    lineHeight: 16,
+  },
   checkboxInner: {
     width: 12,
     height: 12,
     borderRadius: 2,
+    backgroundColor: theme.colors.background,
   },
   text: {
     color: theme.colors.text,
     fontSize: 16,
     lineHeight: 24,
     flex: 1,
+  },
+  textChecked: {
+    textDecorationLine: 'line-through',
+    opacity: 0.5,
   },
   trashButton: {
     marginLeft: 12,
