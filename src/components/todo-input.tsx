@@ -42,13 +42,8 @@ const TodoInput = (props: TodoInputProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.surface0,
-    borderRadius: 12,
-    padding: 12,
-    marginVertical: 6,
-    marginHorizontal: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.blue,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -58,21 +53,19 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: 16,
     lineHeight: 24,
-    paddingVertical: 4,
+    paddingVertical: 8,
   },
   button: {
-    backgroundColor: theme.colors.blue,
-    borderRadius: 8,
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   buttonText: {
-    color: theme.colors.base,
-    fontSize: 14,
-    fontWeight: '600',
+    color: theme.colors.overlay1,
+    fontSize: 16,
+    fontWeight: '400',
   },
   buttonTextDisabled: {
-    opacity: 0.5,
+    opacity: 0.3,
   },
 });
 
