@@ -4,7 +4,7 @@ import { theme } from "../theme";
 export default function RootLayout() {
   return (
     <Stack
-      screenOptions={{
+      screenOptions={ {
         headerStyle: {
           backgroundColor: theme.colors.background,
         },
@@ -15,7 +15,7 @@ export default function RootLayout() {
         contentStyle: {
           backgroundColor: theme.colors.background,
         },
-      }}
+      } }
     />
   );
 }

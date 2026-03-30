@@ -4,7 +4,7 @@ import { theme } from "../theme";
 
 export default function Index() {
   return (
-    <View style={styles.container}>
+    <View style={ styles.container }>
       <Home />
     </View>
   );

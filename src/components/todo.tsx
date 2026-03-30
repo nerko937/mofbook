@@ -3,6 +3,7 @@ import { theme } from '../theme';
 
 type TodoProps = {
   content: string;
+  onDelete: () => void;
 }
 
 const Todo = (props: TodoProps) => {
@@ -11,18 +12,18 @@ const Todo = (props: TodoProps) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={ styles.container }>
       <TouchableOpacity
-        style={styles.checkboxTextContainer}
-        onPress={handleCheckboxPress}
+        style={ styles.checkboxTextContainer }
+        onPress={ handleCheckboxPress }
       >
-        <View style={styles.checkbox}>
-          <View style={styles.checkboxInner} />
+        <View style={ styles.checkbox }>
+          <View style={ styles.checkboxInner } />
         </View>
-        <Text style={styles.text}>{ props.content }</Text>
+        <Text style={ styles.text }>{ props.content }</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.trashButton}>
-        <Text style={styles.trashIcon}>×</Text>
+      <TouchableOpacity style={ styles.trashButton } onPress={ props.onDelete }>
+        <Text style={ styles.trashIcon }>×</Text>
       </TouchableOpacity>
     </View>
   );
