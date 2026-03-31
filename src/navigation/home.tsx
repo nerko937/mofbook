@@ -4,11 +4,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Todo from '../components/todo';
 import TodoInput from '../components/todo-input';
+import TabBar, { TabItem } from '../components/tab-bar';
 import { theme } from '../theme';
 
 type TodoItem = {
@@ -16,23 +18,141 @@ type TodoItem = {
   checked: boolean;
 }
 
+type TabData = {
+  id: string;
+  name: string;
+  todos: TodoItem[];
+  isNaming: boolean;
+}
+
 const Home = () => {
-  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [tabs, setTabs] = useState<TabData[]>([]);
+  const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
 
+  useEffect(() => {
+    if (tabs.length === 0) {
+      const newTab: TabData = {
+        id: Date.now().toString(),
+        name: '',
+        todos: [],
+        isNaming: true,
+      };
+      setTabs([newTab]);
+      setActiveTabId(newTab.id);
+    }
+  }, [tabs.length]);
+
+  const activeTab = tabs.find(tab => tab.id === activeTabId);
+
+  const handleTabNameSubmit = (id: string, name: string) => {
+    setTabs(tabs.map(tab =>
+      tab.id === id ? { ...tab, name, isNaming: false } : tab
+    ));
+  };
+
+  const handleTabPress = (id: string) => {
+    setActiveTabId(id);
+  };
+
+  const handleTabClose = (id: string) => {
+    const tabToClose = tabs.find(tab => tab.id === id);
+    
+    if (tabToClose?.isNaming) {
+      const newTabs = tabs.filter(tab => tab.id !== id);
+      setTabs(newTabs);
+      
+      if (activeTabId === id) {
+        if (newTabs.length > 0) {
+          setActiveTabId(newTabs[0].id);
+        } else {
+          setActiveTabId(null);
+        }
+      }
+      return;
+    }
+
+    Alert.alert(
+      'Delete Tab',
+      'Are you sure you want to delete this tab? All todos in this tab will be lost.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            const newTabs = tabs.filter(tab => tab.id !== id);
+            setTabs(newTabs);
+
+            if (activeTabId === id) {
+              if (newTabs.length > 0) {
+                setActiveTabId(newTabs[0].id);
+              } else {
+                setActiveTabId(null);
+              }
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleNewTab = () => {
+    const newTab: TabData = {
+      id: Date.now().toString(),
+      name: '',
+      todos: [],
+      isNaming: true,
+    };
+    setTabs([...tabs, newTab]);
+    setActiveTabId(newTab.id);
+  };
+
   const handleAddTodo = (content: string) => {
-    setTodos([...todos, { content, checked: false }]);
+    if (!activeTabId) return;
+
+    setTabs(tabs.map(tab =>
+      tab.id === activeTabId
+        ? { ...tab, todos: [...tab.todos, { content, checked: false }] }
+        : tab
+    ));
   };
 
   const handleDeleteTodo = (index: number) => {
-    setTodos(todos.filter((_, i) => i !== index));
+    if (!activeTabId) return;
+
+    setTabs(tabs.map(tab =>
+      tab.id === activeTabId
+        ? { ...tab, todos: tab.todos.filter((_, i) => i !== index) }
+        : tab
+    ));
   };
 
   const handleToggleCheck = (index: number) => {
-    setTodos(todos.map((todo, i) =>
-      i === index ? { ...todo, checked: !todo.checked } : todo
+    if (!activeTabId) return;
+
+    setTabs(tabs.map(tab =>
+      tab.id === activeTabId
+        ? {
+          ...tab,
+          todos: tab.todos.map((todo, i) =>
+            i === index ? { ...todo, checked: !todo.checked } : todo
+          ),
+        }
+        : tab
     ));
   };
+
+  const tabItems: TabItem[] = tabs.map(tab => ({
+    id: tab.id,
+    name: tab.name,
+    isNaming: tab.isNaming,
+  }));
+
+  const hasNamingTab = tabs.some(tab => tab.isNaming);
 
   return (
     <KeyboardAvoidingView
@@ -40,12 +160,20 @@ const Home = () => {
       behavior={ Platform.OS === 'ios' ? 'padding' : 'height' }
       keyboardVerticalOffset={ 30 }
     >
+      <TabBar
+        tabs={ tabItems }
+        activeTabId={ activeTabId }
+        onTabPress={ handleTabPress }
+        onTabClose={ handleTabClose }
+        onTabNameSubmit={ handleTabNameSubmit }
+        onNewTab={ handleNewTab }
+      />
       <ScrollView
         style={ styles.scrollView }
         contentContainerStyle={ styles.scrollContent }
         keyboardShouldPersistTaps="handled"
       >
-        { todos.map((todo, index) => (
+        { activeTab?.todos.map((todo, index) => (
           <Todo
             key={ index }
             content={ todo.content }
@@ -56,7 +184,7 @@ const Home = () => {
         )) }
       </ScrollView>
       <View style={ [styles.inputContainer, { paddingBottom: insets.bottom + 12 }] }>
-        <TodoInput onAdd={ handleAddTodo } />
+        <TodoInput onAdd={ handleAddTodo } disabled={ hasNamingTab } />
       </View>
     </KeyboardAvoidingView>
   );

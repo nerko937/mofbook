@@ -16,14 +16,16 @@ const renderHome = () => {
 };
 
 describe('Home', () => {
-  it('starts with an empty list', () => {
+  it('starts with inline tab naming', () => {
     renderHome();
-    const placeholder = screen.getByPlaceholderText('Add new todo...');
-    expect(placeholder).toBeTruthy();
+    expect(screen.getByPlaceholderText('Tab name...')).toBeTruthy();
   });
 
   it('adds new todo item and removes it', () => {
     renderHome();
+    
+    fireEvent.changeText(screen.getByPlaceholderText('Tab name...'), 'My Tab');
+    fireEvent(screen.getByPlaceholderText('Tab name...'), 'submitEditing');
     
     const input = screen.getByPlaceholderText('Add new todo...');
     const addButton = screen.getByText('Add');
@@ -35,7 +37,7 @@ describe('Home', () => {
     expect(input.props.value).toBe('');
     
     const deleteButtons = screen.getAllByText('×');
-    fireEvent.press(deleteButtons[0]);
+    fireEvent.press(deleteButtons[1]);
     
     expect(screen.queryByText('Item to delete')).toBeNull();
   });
@@ -43,18 +45,26 @@ describe('Home', () => {
   it('does not add empty todos', () => {
     renderHome();
     
-    const input = screen.getByPlaceholderText('Add new todo...');
-    const addButton = screen.getByText('Add');
+    fireEvent.changeText(screen.getByPlaceholderText('Tab name...'), 'My Tab');
+    fireEvent(screen.getByPlaceholderText('Tab name...'), 'submitEditing');
     
-    fireEvent.changeText(input, '   ');
-    fireEvent.press(addButton);
+    fireEvent.changeText(screen.getByPlaceholderText('Add new todo...'), 'Valid todo');
+    fireEvent.press(screen.getByText('Add'));
+    
+    expect(screen.getByText('Valid todo')).toBeTruthy();
+    
+    fireEvent.changeText(screen.getByPlaceholderText('Add new todo...'), '   ');
+    fireEvent.press(screen.getByText('Add'));
     
     const deleteButtons = screen.queryAllByText('×');
-    expect(deleteButtons).toHaveLength(0);
+    expect(deleteButtons).toHaveLength(2);
   });
 
   it('toggles checkbox and applies strikethrough when checked', () => {
     renderHome();
+    
+    fireEvent.changeText(screen.getByPlaceholderText('Tab name...'), 'My Tab');
+    fireEvent(screen.getByPlaceholderText('Tab name...'), 'submitEditing');
     
     const input = screen.getByPlaceholderText('Add new todo...');
     const addButton = screen.getByText('Add');

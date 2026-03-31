@@ -10,6 +10,7 @@ import { theme } from '../theme';
 
 type TodoInputProps = {
   onAdd: (content: string) => void;
+  disabled?: boolean;
 }
 
 const TodoInput = (props: TodoInputProps) => {
@@ -17,7 +18,7 @@ const TodoInput = (props: TodoInputProps) => {
   const inputRef = useRef<TextInput>(null);
 
   const handleAdd = () => {
-    if (text.trim()) {
+    if (text.trim() && !props.disabled) {
       props.onAdd(text.trim());
       setText('');
       inputRef.current?.focus();
@@ -36,13 +37,19 @@ const TodoInput = (props: TodoInputProps) => {
         onSubmitEditing={ handleAdd }
         returnKeyType="done"
         submitBehavior='submit'
+        editable={ !props.disabled }
       />
       <TouchableOpacity
         style={ styles.button }
         onPress={ handleAdd }
-        disabled={ !text.trim() }
+        disabled={ !text.trim() || props.disabled }
       >
-        <Text style={ [styles.buttonText, !text.trim() && styles.buttonTextDisabled] }>
+        <Text
+          style={ [
+            styles.buttonText,
+            (!text.trim() || props.disabled) && styles.buttonTextDisabled,
+          ] }
+        >
           Add
         </Text>
       </TouchableOpacity>
