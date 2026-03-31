@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexDirection: 'row',
     gap: 1,
-    paddingHorizontal: 8,
+    paddingHorizontal: 1,
   },
   newTabButton: {
     paddingHorizontal: 12,
