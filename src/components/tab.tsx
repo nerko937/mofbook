@@ -6,6 +6,7 @@ import {
     TextInput
 } from "react-native";
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { theme } from "../theme";
 
 type TabProps = {
@@ -21,6 +22,7 @@ type TabProps = {
 const Tab = (props: TabProps) => {
     const [inputValue, setInputValue] = useState("");
     const inputRef = useRef<TextInput>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (props.isNaming) {
@@ -46,7 +48,7 @@ const Tab = (props: TabProps) => {
                 <TextInput
                     ref={inputRef}
                     style={styles.input}
-                    placeholder="Tab name..."
+                    placeholder={t("home.tabPlaceholder")}
                     placeholderTextColor={theme.colors.overlay1}
                     value={inputValue}
                     onChangeText={setInputValue}

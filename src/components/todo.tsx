@@ -77,12 +77,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         lineHeight: 16
     },
-    checkboxInner: {
-        width: 12,
-        height: 12,
-        borderRadius: 2,
-        backgroundColor: theme.colors.background
-    },
     text: {
         color: theme.colors.text,
         fontSize: 16,

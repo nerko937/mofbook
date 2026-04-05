@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { theme } from "../theme";
+import "../i18n";
 
 export default function RootLayout() {
     return (

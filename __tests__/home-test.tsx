@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Home from "../src/navigation/home";
+import "../src/i18n";
 
 const renderHome = () => {
     return render(

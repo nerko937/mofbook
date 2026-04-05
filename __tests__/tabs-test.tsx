@@ -1,12 +1,7 @@
-import {
-    render,
-    screen,
-    fireEvent,
-    waitFor,
-    act
-} from "@testing-library/react-native";
+import { render, screen, fireEvent, act } from "@testing-library/react-native";
 import Home from "../src/navigation/home";
 import { Alert } from "react-native";
+import "../src/i18n";
 
 jest.mock("react-native-safe-area-context", () => ({
     useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 })

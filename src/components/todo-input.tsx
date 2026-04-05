@@ -6,6 +6,7 @@ import {
     StyleSheet
 } from "react-native";
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { theme } from "../theme";
 
 type TodoInputProps = {
@@ -16,6 +17,7 @@ type TodoInputProps = {
 const TodoInput = (props: TodoInputProps) => {
     const [text, setText] = useState("");
     const inputRef = useRef<TextInput>(null);
+    const { t } = useTranslation();
 
     const handleAdd = () => {
         if (text.trim() && !props.disabled) {
@@ -30,7 +32,7 @@ const TodoInput = (props: TodoInputProps) => {
             <TextInput
                 ref={inputRef}
                 style={styles.input}
-                placeholder="Add new todo..."
+                placeholder={t("home.todoPlaceholder")}
                 placeholderTextColor={theme.colors.overlay1}
                 value={text}
                 onChangeText={setText}
@@ -51,7 +53,7 @@ const TodoInput = (props: TodoInputProps) => {
                             styles.buttonTextDisabled
                     ]}
                 >
-                    Add
+                    {t("home.addButton")}
                 </Text>
             </TouchableOpacity>
         </View>

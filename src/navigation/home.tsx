@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 import Todo from "../components/todo";
 import TodoInput from "../components/todo-input";
 import TabBar, { TabItem } from "../components/tab-bar";
@@ -29,6 +30,7 @@ const Home = () => {
     const [tabs, setTabs] = useState<TabData[]>([]);
     const [activeTabId, setActiveTabId] = useState<string | null>(null);
     const insets = useSafeAreaInsets();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (tabs.length === 0) {
@@ -48,7 +50,9 @@ const Home = () => {
     const handleTabNameSubmit = (id: string, name: string) => {
         setTabs(
             tabs.map((tab) =>
-                tab.id === id ? { ...tab, name, isNaming: false } : tab
+                tab.id === id
+                    ? { ...tab, name: name.trim(), isNaming: false }
+                    : tab
             )
         );
     };
@@ -74,32 +78,28 @@ const Home = () => {
             return;
         }
 
-        Alert.alert(
-            "Delete Tab",
-            "Are you sure you want to delete this tab? All todos in this tab will be lost.",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel"
-                },
-                {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: () => {
-                        const newTabs = tabs.filter((tab) => tab.id !== id);
-                        setTabs(newTabs);
+        Alert.alert(t("home.deleteTab"), t("home.deleteTabMessage"), [
+            {
+                text: t("home.cancel"),
+                style: "cancel"
+            },
+            {
+                text: t("home.delete"),
+                style: "destructive",
+                onPress: () => {
+                    const newTabs = tabs.filter((tab) => tab.id !== id);
+                    setTabs(newTabs);
 
-                        if (activeTabId === id) {
-                            if (newTabs.length > 0) {
-                                setActiveTabId(newTabs[0].id);
-                            } else {
-                                setActiveTabId(null);
-                            }
+                    if (activeTabId === id) {
+                        if (newTabs.length > 0) {
+                            setActiveTabId(newTabs[0].id);
+                        } else {
+                            setActiveTabId(null);
                         }
                     }
                 }
-            ]
-        );
+            }
+        ]);
     };
 
     const handleNewTab = () => {
