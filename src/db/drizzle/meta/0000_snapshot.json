@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c2695890-ce3d-405c-a9c7-32c42d9dedf1",
+  "id": "c950cdb0-b619-4056-9ee2-e481825c8c24",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "checklist_groups": {
-      "name": "checklist_groups",
+    "todo_groups": {
+      "name": "todo_groups",
       "columns": {
         "id": {
           "name": "id",
@@ -14,8 +14,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "checklist_id": {
-          "name": "checklist_id",
+        "todo_id": {
+          "name": "todo_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -31,12 +31,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "checklist_groups_checklist_id_checklists_id_fk": {
-          "name": "checklist_groups_checklist_id_checklists_id_fk",
-          "tableFrom": "checklist_groups",
-          "tableTo": "checklists",
+        "todo_groups_todo_id_todos_id_fk": {
+          "name": "todo_groups_todo_id_todos_id_fk",
+          "tableFrom": "todo_groups",
+          "tableTo": "todos",
           "columnsFrom": [
-            "checklist_id"
+            "todo_id"
           ],
           "columnsTo": [
             "id"
@@ -49,8 +49,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "checklist_items": {
-      "name": "checklist_items",
+    "todo_items": {
+      "name": "todo_items",
       "columns": {
         "id": {
           "name": "id",
@@ -83,10 +83,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "checklist_items_group_id_checklist_groups_id_fk": {
-          "name": "checklist_items_group_id_checklist_groups_id_fk",
-          "tableFrom": "checklist_items",
-          "tableTo": "checklist_groups",
+        "todo_items_group_id_todo_groups_id_fk": {
+          "name": "todo_items_group_id_todo_groups_id_fk",
+          "tableFrom": "todo_items",
+          "tableTo": "todo_groups",
           "columnsFrom": [
             "group_id"
           ],
@@ -101,8 +101,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "checklists": {
-      "name": "checklists",
+    "todos": {
+      "name": "todos",
       "columns": {
         "id": {
           "name": "id",

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Slot } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { Text, View } from 'react-native';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
@@ -32,5 +32,8 @@ export default function RootLayout() {
     return null; 
   }
 
-  return <Slot />; 
+  return <Stack>
+    <Stack.Screen name='index'/>
+    <Stack.Screen name='todos/[id]'/>
+  </Stack>
 }

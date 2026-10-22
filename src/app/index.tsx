@@ -1,51 +1,62 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { useEffect, useState } from 'react';
-import { checklists, checklistGroups, checklistItems, NewChecklistItem } from '../db/schema';
+import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { useState } from 'react';
+import { Link } from 'expo-router';
+import { todos, NewTodo, todoGroups } from '../db/schema';
 import { db } from '../db/client';
 
 export default function App() {
-  const [items, setItems] = useState<NewChecklistItem[]>([]);
-  
-  useEffect(() => {
-    const setupAndLoadData = async () => {
-      try {
-        let existingItems = await db.select().from(checklistItems);
-        if (existingItems.length === 0) {
-          const [main] = await db.insert(checklists).values({ name: "main" }).returning({ id: checklists.id });
-          const [group] = await db.insert(checklistGroups).values({ checklistId: main.id, position: 1 }).returning({ id: checklistGroups.id });
-          
-          existingItems = await db.insert(checklistItems).values([
-            { groupId: group.id, content: "item 1", position: 1 },
-            { groupId: group.id, content: "item 2", position: 2 },
-            { groupId: group.id, content: "item 3", position: 3 },
-          ]).returning();
-        }
-        setItems(existingItems);
-      } catch (e) {
-        console.error("Error loading database:", e);
-      }
-    };
+  const [todoItems, setTodos] = useState<NewTodo[]>([]);
+  const [newTodoName, setNewTodoName] = useState("");
 
-    setupAndLoadData();
-  }, []);
+  const handleAddTodo = async () => {
+    if (!newTodoName.trim()) return;
+    try {
+      const [newTodo] = await db.insert(todos).values({name: newTodoName}).returning();
+      await db.insert(todoGroups).values({todoId: newTodo.id, position: 1})
+      setTodos((prev) => [...prev, newTodo]);
+      setNewTodoName("");
+    } catch (e) {
+      console.error("Error adding todo:", e);
+    }
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>My Checklist</Text>
+      <Text style={styles.header}>Todos</Text>
+
       <FlatList 
-        data={items} 
-        keyExtractor={(item) => {
-          if (!item.id) {
-            throw new Error(`Critical Error: Checklist item is missing an ID! Item data: ${JSON.stringify(item)}`);
+        data={todoItems} 
+        keyExtractor={(todo) => {
+          if (!todo.id) {
+            throw new Error(`Todo doesn't have id, item data: ${JSON.stringify(todo)}`);
           }
-          return item.id.toString();
+          return todo.id.toString();
         }}
         renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={styles.text}>{item.content}</Text>
-          </View>
+          <Link
+            style={styles.row}
+            href={{
+              pathname: "/todos/[id]",
+              params: { id: item.id! }
+            }}
+            asChild
+          >
+            <Text style={styles.text}>{item.name}</Text>
+          </Link>
         )}
       />
+      
+      <View style={styles.inputContainer}>
+        <TextInput 
+          style={styles.input}
+          // placeholder="Add a new item..."
+          value={newTodoName}
+          onChangeText={setNewTodoName}
+          onSubmitEditing={handleAddTodo}
+        />
+        <Button title="Add" onPress={handleAddTodo} />
+      </View>
+
     </View>
   );
 }
@@ -57,16 +68,25 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
   },
-  centerContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   header: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginRight: 10,
   },
   row: {
     paddingVertical: 15,
