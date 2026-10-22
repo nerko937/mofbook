@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c950cdb0-b619-4056-9ee2-e481825c8c24",
+  "id": "683bb761-e7ba-44c8-ac08-256e848e0fc5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "todo_groups": {
@@ -29,7 +29,16 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "todo_groups_todo_id_position_uk": {
+          "name": "todo_groups_todo_id_position_uk",
+          "columns": [
+            "todo_id",
+            "position"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "todo_groups_todo_id_todos_id_fk": {
           "name": "todo_groups_todo_id_todos_id_fk",
@@ -81,7 +90,16 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "todo_items_group_id_position_uk": {
+          "name": "todo_items_group_id_position_uk",
+          "columns": [
+            "group_id",
+            "position"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "todo_items_group_id_todo_groups_id_fk": {
           "name": "todo_items_group_id_todo_groups_id_fk",

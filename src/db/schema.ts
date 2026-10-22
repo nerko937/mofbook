@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
 
@@ -14,7 +14,9 @@ export const todoGroups = sqliteTable("todo_groups", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   todoId: integer('todo_id').references(() => todos.id, { onDelete: 'cascade' }).notNull(),
   position: integer("position").notNull(),
-})
+}, (t) => [
+  unique("todo_groups_todo_id_position_uk").on(t.todoId, t.position)
+])
 export type TodoGroup = typeof todoGroups.$inferSelect;
 export type NewTodoGroup = typeof todoGroups.$inferInsert;
 
@@ -24,7 +26,9 @@ export const todoItems = sqliteTable("todo_items", {
   groupId: integer('group_id').references(() => todoGroups.id, { onDelete: 'cascade' }).notNull(),
   content: text("content").notNull(),
   position: integer("position").notNull(),
-})
+}, (t) => [
+  unique("todo_items_group_id_position_uk").on(t.groupId, t.position)
+])
 export type TodoItem = typeof todoItems.$inferSelect;
 export type NewTodoItem = typeof todoItems.$inferInsert;
 
