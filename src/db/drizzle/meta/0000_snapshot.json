@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d40ae584-c1fd-49f2-907c-cd3e1b2da3c6",
+  "id": "de980639-61b3-46fb-b086-39a26eeb520e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "todo_groups": {
@@ -142,7 +142,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "CURRENT TIMESTAMP"
+          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {},

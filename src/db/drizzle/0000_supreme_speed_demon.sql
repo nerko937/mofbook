@@ -18,5 +18,5 @@ CREATE UNIQUE INDEX `todo_items_group_id_position_uk` ON `todo_items` (`group_id
 CREATE TABLE `todos` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text(200) NOT NULL,
-	`created_at` text DEFAULT CURRENT TIMESTAMP NOT NULL
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
