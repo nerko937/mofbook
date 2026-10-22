@@ -1,10 +1,12 @@
 import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm'
 import { relations } from 'drizzle-orm';
 
 
 export const todos = sqliteTable("todos", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name", { length: 200 }).notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT TIMESTAMP`)
 });
 export type Todo = typeof todos.$inferSelect;
 export type NewTodo = typeof todos.$inferInsert;
