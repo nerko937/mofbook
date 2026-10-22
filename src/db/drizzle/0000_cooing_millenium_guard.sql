@@ -17,5 +17,6 @@ CREATE TABLE `todo_items` (
 CREATE UNIQUE INDEX `todo_items_group_id_position_uk` ON `todo_items` (`group_id`,`position`);--> statement-breakpoint
 CREATE TABLE `todos` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`name` text(200) NOT NULL
+	`name` text(200) NOT NULL,
+	`created_at` text DEFAULT CURRENT TIMESTAMP NOT NULL
 );
