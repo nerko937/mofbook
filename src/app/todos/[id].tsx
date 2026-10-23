@@ -58,7 +58,7 @@ export default function App() {
         }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <Text style={styles.text}>{item.item?.content}</Text>
+            <Text style={styles.text}>{`${item.group.id} | ${item.item?.content}`}</Text>
           </View>
         )}
       />
