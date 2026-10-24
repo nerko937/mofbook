@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { Modal, FlatList, Alert, StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import { useState } from 'react';
 import { Link } from 'expo-router';
 import { todos, NewTodo, todoGroups } from '../db/schema';

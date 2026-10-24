@@ -1,8 +1,8 @@
 import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { todoGroups, todoItems } from '../../db/schema';
+import { todoGroups, todoItems, TodoGroup } from '../../db/schema';
 import { db } from '../../db/client';
 import { eq } from 'drizzle-orm';
 
@@ -25,12 +25,22 @@ export default function App() {
     [itemsTracker]
   );
 
+  const [selectedGroup, setSelectedGroup] = useState<TodoGroup | undefined>()
+  const [groupSelectIsOpen, setGroupSelectIsOpen] = useState(false)
+  useEffect(() => {
+    if (selectedGroup) return;
+    if (!itemsAndGroups) return;
+    setSelectedGroup(itemsAndGroups[-1]?.group)
+    setGroupSelectIsOpen(true)
+  }, [itemsAndGroups])
+
   const handleAddItem = async () => {
     if (!newItemText.trim()) return;
     if (!itemsAndGroups) return;
+    if (!selectedGroup) return;
 
     await db.insert(todoItems).values({
-      groupId: itemsAndGroups[0].group.id,
+      groupId: selectedGroup.id,
       content: newItemText,
       position: itemsAndGroups.length + 1
     })
@@ -38,9 +48,22 @@ export default function App() {
     refreshItemsTracker(!itemsTracker)
   };
 
+
   return (
     <View style={styles.container}>
+      <View style={styles.header}><Text>Selected group: {selectedGroup?.id}</Text></View>
       <View style={styles.inputContainer}>
+        {groupSelectIsOpen ? (
+          <Button title="Group" onPress={() => {setGroupSelectIsOpen(false)}} />
+        ) : (
+          [...new Set(itemsAndGroups.map(el => el.group))].map((group) => (
+            <Button 
+              key={group.id} 
+              title={String(group.id)} 
+              onPress={() => {setSelectedGroup(group);setGroupSelectIsOpen(true)}} 
+            />
+          ))
+        )}
         <TextInput 
           style={styles.input}
           placeholder="Add a new item..."
@@ -58,7 +81,7 @@ export default function App() {
         }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <Text style={styles.text}>{`${item.group.id} | ${item.item?.content}`}</Text>
+            {(item.group && item.item) ? (<Text style={styles.text}>{`${item.group.id} | ${item.item?.content}`}</Text>) : (undefined)}
           </View>
         )}
       />
