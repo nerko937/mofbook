@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { todoGroups, todoItems, TodoGroup } from '../../db/schema';
-import { db } from '../../db/client';
+import { db } from '@/db/client';
 import { eq } from 'drizzle-orm';
 
 export default function App() {
