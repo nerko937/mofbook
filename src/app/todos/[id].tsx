@@ -1,51 +1,73 @@
 import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { todoGroups, todoItems, TodoGroup } from '../../db/schema';
 import { db } from '@/db/client';
-import { eq } from 'drizzle-orm';
+import { eq, max } from 'drizzle-orm';
 
 export default function App() {
   const { id } = useLocalSearchParams();
   const safeId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
   const [newItemText, setNewItemText] = useState("");
-  const [itemsTracker, refreshItemsTracker] = useState(false)
 
-  const { data: itemsAndGroups } = useLiveQuery(
-    db.select({
-      item: todoItems,
-      group: todoGroups,
-    })
-    .from(todoGroups)
-    .leftJoin(todoItems, eq(todoItems.groupId, todoGroups.id))
-    .where(eq(todoGroups.todoId, safeId))
-    .orderBy(todoGroups.position, todoItems.position),
-    [itemsTracker]
+  // useLiveQuery only watches the primary `from` table — items must be queried from todo_items.
+  const { data: groups } = useLiveQuery(
+    db
+      .select()
+      .from(todoGroups)
+      .where(eq(todoGroups.todoId, safeId))
+      .orderBy(todoGroups.position),
+    [safeId]
   );
 
-  const [selectedGroup, setSelectedGroup] = useState<TodoGroup | undefined>()
-  const [groupSelectIsOpen, setGroupSelectIsOpen] = useState(false)
+  const { data: itemsWithGroups } = useLiveQuery(
+    db
+      .select({
+        item: todoItems,
+        group: todoGroups,
+      })
+      .from(todoItems)
+      .innerJoin(todoGroups, eq(todoItems.groupId, todoGroups.id))
+      .where(eq(todoGroups.todoId, safeId))
+      .orderBy(todoGroups.position, todoItems.position),
+    [safeId]
+  );
+
+  const uniqueGroups = groups ?? [];
+
+  const [selectedGroup, setSelectedGroup] = useState<TodoGroup | undefined>();
+  const [groupSelectIsOpen, setGroupSelectIsOpen] = useState(false);
   useEffect(() => {
     if (selectedGroup) return;
-    if (!itemsAndGroups) return;
-    setSelectedGroup(itemsAndGroups[-1]?.group)
-    setGroupSelectIsOpen(true)
-  }, [itemsAndGroups])
+    if (!groups?.length) return;
+    setSelectedGroup(groups[0]);
+    setGroupSelectIsOpen(true);
+  }, [groups, selectedGroup]);
+
+  const addingRef = useRef(false);
 
   const handleAddItem = async () => {
-    if (!newItemText.trim()) return;
-    if (!itemsAndGroups) return;
-    if (!selectedGroup) return;
+    const content = newItemText.trim();
+    if (!content || !selectedGroup || addingRef.current) return;
 
-    await db.insert(todoItems).values({
-      groupId: selectedGroup.id,
-      content: newItemText,
-      position: itemsAndGroups.length + 1
-    })
-    setNewItemText("");
-    refreshItemsTracker(!itemsTracker)
+    addingRef.current = true;
+    try {
+      const [{ maxPos }] = await db
+        .select({ maxPos: max(todoItems.position) })
+        .from(todoItems)
+        .where(eq(todoItems.groupId, selectedGroup.id));
+
+      await db.insert(todoItems).values({
+        groupId: selectedGroup.id,
+        content,
+        position: (maxPos ?? 0) + 1,
+      });
+      setNewItemText("");
+    } finally {
+      addingRef.current = false;
+    }
   };
 
 
@@ -56,7 +78,7 @@ export default function App() {
         {groupSelectIsOpen ? (
           <Button title="Group" onPress={() => {setGroupSelectIsOpen(false)}} />
         ) : (
-          [...new Set(itemsAndGroups.map(el => el.group))].map((group) => (
+          uniqueGroups.map((group) => (
             <Button 
               key={group.id} 
               title={String(group.id)} 
@@ -75,13 +97,13 @@ export default function App() {
       </View>
 
       <FlatList 
-        data={itemsAndGroups.filter(el => !!el)} 
-        keyExtractor={(el) => {
-          return `group${el.group.id}-item${el.item?.id}`;
-        }}
-        renderItem={({ item }) => (
+        data={itemsWithGroups ?? []}
+        keyExtractor={(row) => `item-${row.item.id}`}
+        renderItem={({ item: row }) => (
           <View style={styles.row}>
-            {(item.group && item.item) ? (<Text style={styles.text}>{`${item.group.id} | ${item.item?.content}`}</Text>) : (undefined)}
+            <Text style={styles.text}>
+              {`${row.group.id} | ${row.item.content}`}
+            </Text>
           </View>
         )}
       />
