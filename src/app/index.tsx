@@ -1,31 +1,23 @@
-import { Modal, FlatList, Alert, StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import { useState } from 'react';
 import { Link } from 'expo-router';
-import { todos, NewTodo, todoGroups } from '../db/schema';
-import { db } from '@/db/client';
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { useTodos } from '@/hooks/useTodos';
 
 export default function App() {
-  const [newTodoName, setNewTodoName] = useState("");
-
-  const { data: fetchedTodos } = useLiveQuery(
-    db.select()
-    .from(todos)
-    .orderBy(todos.createdAt),
-  );
+  const [newTodoName, setNewTodoName] = useState('');
+  const { fetchedTodos, addTodo } = useTodos();
 
   const handleAddTodo = async () => {
-    if (!newTodoName.trim()) return;
-    const [{id}] = await db.insert(todos).values({name: newTodoName}).returning({id: todos.id});
-    await db.insert(todoGroups).values({todoId: id, position: 1})
-  }
+    await addTodo(newTodoName);
+    setNewTodoName('');
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Todos</Text>
 
-      <FlatList 
-        data={fetchedTodos} 
+      <FlatList
+        data={fetchedTodos}
         keyExtractor={(todo) => {
           if (!todo.id) {
             throw new Error(`Todo doesn't have id, item data: ${JSON.stringify(todo)}`);
@@ -34,11 +26,11 @@ export default function App() {
         }}
         renderItem={({ item }) => (
           <Link
-            testID='todo-row'
+            testID="todo-row"
             style={styles.row}
             href={{
-              pathname: "/todos/[id]",
-              params: { id: item.id }
+              pathname: '/todos/[id]',
+              params: { id: item.id },
             }}
             asChild
           >
@@ -46,19 +38,17 @@ export default function App() {
           </Link>
         )}
       />
-      
+
       <View style={styles.inputContainer}>
-        <TextInput 
-          testID='todo-input'
+        <TextInput
+          testID="todo-input"
           style={styles.input}
-          // placeholder="Add a new item..."
           value={newTodoName}
           onChangeText={setNewTodoName}
           onSubmitEditing={handleAddTodo}
         />
-        <Button testID='todo-btn-add' title="Add" onPress={handleAddTodo} />
+        <Button testID="todo-btn-add" title="Add" onPress={handleAddTodo} />
       </View>
-
     </View>
   );
 }
@@ -97,5 +87,5 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-  }
+  },
 });

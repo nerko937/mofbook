@@ -1,39 +1,15 @@
 import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { todoGroups, todoItems, TodoGroup } from '../../db/schema';
-import { db } from '@/db/client';
-import { eq, max } from 'drizzle-orm';
+import type { TodoGroup } from '../../db/schema';
+import { useTodoItems } from '@/hooks/useTodoItems';
 
 export default function App() {
   const { id } = useLocalSearchParams();
   const safeId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
-  const [newItemText, setNewItemText] = useState("");
-
-  // useLiveQuery only watches the primary `from` table — items must be queried from todo_items.
-  const { data: groups } = useLiveQuery(
-    db
-      .select()
-      .from(todoGroups)
-      .where(eq(todoGroups.todoId, safeId))
-      .orderBy(todoGroups.position),
-    [safeId]
-  );
-
-  const { data: itemsWithGroups } = useLiveQuery(
-    db
-      .select({
-        item: todoItems,
-        group: todoGroups,
-      })
-      .from(todoItems)
-      .innerJoin(todoGroups, eq(todoItems.groupId, todoGroups.id))
-      .where(eq(todoGroups.todoId, safeId))
-      .orderBy(todoGroups.position, todoItems.position),
-    [safeId]
-  );
+  const [newItemText, setNewItemText] = useState('');
+  const { groups, itemsWithGroups, addItem } = useTodoItems(safeId);
 
   const uniqueGroups = groups ?? [];
 
@@ -46,47 +22,37 @@ export default function App() {
     setGroupSelectIsOpen(true);
   }, [groups, selectedGroup]);
 
-  const addingRef = useRef(false);
-
   const handleAddItem = async () => {
-    const content = newItemText.trim();
-    if (!content || !selectedGroup || addingRef.current) return;
+    if (!newItemText.trim() || !selectedGroup) return;
 
-    addingRef.current = true;
-    try {
-      const [{ maxPos }] = await db
-        .select({ maxPos: max(todoItems.position) })
-        .from(todoItems)
-        .where(eq(todoItems.groupId, selectedGroup.id));
-
-      await db.insert(todoItems).values({
-        groupId: selectedGroup.id,
-        content,
-        position: (maxPos ?? 0) + 1,
-      });
-      setNewItemText("");
-    } finally {
-      addingRef.current = false;
-    }
+    await addItem({
+      groupId: selectedGroup.id,
+      content: newItemText,
+    });
+    setNewItemText('');
   };
-
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}><Text>Selected group: {selectedGroup?.id}</Text></View>
+      <View style={styles.header}>
+        <Text>Selected group: {selectedGroup?.id}</Text>
+      </View>
       <View style={styles.inputContainer}>
         {groupSelectIsOpen ? (
-          <Button title="Group" onPress={() => {setGroupSelectIsOpen(false)}} />
+          <Button title="Group" onPress={() => setGroupSelectIsOpen(false)} />
         ) : (
           uniqueGroups.map((group) => (
-            <Button 
-              key={group.id} 
-              title={String(group.id)} 
-              onPress={() => {setSelectedGroup(group);setGroupSelectIsOpen(true)}} 
+            <Button
+              key={group.id}
+              title={String(group.id)}
+              onPress={() => {
+                setSelectedGroup(group);
+                setGroupSelectIsOpen(true);
+              }}
             />
           ))
         )}
-        <TextInput 
+        <TextInput
           style={styles.input}
           placeholder="Add a new item..."
           value={newItemText}
@@ -96,7 +62,7 @@ export default function App() {
         <Button title="Add" onPress={handleAddItem} />
       </View>
 
-      <FlatList 
+      <FlatList
         data={itemsWithGroups ?? []}
         keyExtractor={(row) => `item-${row.item.id}`}
         renderItem={({ item: row }) => (
@@ -145,5 +111,5 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-  }
+  },
 });
