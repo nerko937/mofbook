@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import { useState } from 'react';
 import { Link } from 'expo-router';
-import { useTodos } from '@/hooks/useTodos';
+import { useTodos } from '@/hooks/todos';
 
 export default function Index() {
   const [newTodoName, setNewTodoName] = useState('');

@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-nativ
 import { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import type { TodoGroup } from '../../db/schema';
-import { useTodoItems } from '@/hooks/useTodoItems';
+import { useTodoGroups, useTodoItems } from '@/hooks/todos';
 
 const colors = [
   "#3B82F6",
@@ -22,18 +22,19 @@ export default function TodoDetails() {
   const safeId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
   const [newItemText, setNewItemText] = useState('');
-  const { groups, itemsWithGroups, addItem } = useTodoItems(safeId);
+  const { itemsWithGroups, addItem } = useTodoItems(safeId);
+  const { fetchedGroups } = useTodoGroups(safeId)
 
-  const uniqueGroups = groups ?? [];
+  const groups = fetchedGroups ?? [];
 
   const [selectedGroup, setSelectedGroup] = useState<TodoGroup | undefined>();
   const [groupSelectIsOpen, setGroupSelectIsOpen] = useState(false);
   useEffect(() => {
     if (selectedGroup) return;
-    if (!groups?.length) return;
-    setSelectedGroup(groups[0]);
+    if (!fetchedGroups?.length) return;
+    setSelectedGroup(fetchedGroups[0]);
     setGroupSelectIsOpen(true);
-  }, [groups, selectedGroup]);
+  }, [fetchedGroups, selectedGroup]);
 
   const handleAddItem = async () => {
     if (!newItemText.trim() || !selectedGroup) return;
@@ -51,7 +52,7 @@ export default function TodoDetails() {
         {groupSelectIsOpen ? (
           <Button title="Group" color={colors[selectedGroup?.position ?? 0]} onPress={() => setGroupSelectIsOpen(false)} />
         ) : (
-          uniqueGroups.map((group) => (
+          groups.map((group) => (
             <Button
               title="Swtich to"
               key={group.id}

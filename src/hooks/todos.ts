@@ -1,13 +1,33 @@
 import { useRef } from 'react';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import {
+  addTodo,
+  addTodoGroup,
   addTodoItem,
   todoGroupsForTodoQuery,
   todoItemsWithGroupsQuery,
-} from '@/db/repositories/todo-items.repository';
+  todosListQuery,
+} from '@/db/todos.repository';
+
+export function useTodos() {
+  const { data: fetchedTodos } = useLiveQuery(todosListQuery());
+
+  return {
+    fetchedTodos,
+    addTodo,
+  };
+}
+
+export function useTodoGroups(todoId: number) {
+  const { data: fetchedGroups } = useLiveQuery(todoGroupsForTodoQuery(todoId), [todoId]);
+
+  return {
+    fetchedGroups,
+    addTodoGroup,
+  }
+}
 
 export function useTodoItems(todoId: number) {
-  const { data: groups } = useLiveQuery(todoGroupsForTodoQuery(todoId), [todoId]);
   const { data: itemsWithGroups } = useLiveQuery(
     todoItemsWithGroupsQuery(todoId),
     [todoId],
@@ -26,7 +46,6 @@ export function useTodoItems(todoId: number) {
   };
 
   return {
-    groups,
     itemsWithGroups,
     addItem,
   };

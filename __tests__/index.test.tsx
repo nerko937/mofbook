@@ -1,8 +1,8 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
-import { useTodos } from '@/hooks/useTodos';
+import { useTodos } from '@/hooks/todos';
 import Index from '@/app/index';
 
-jest.mock('@/hooks/useTodos', () => ({
+jest.mock('@/hooks/todos', () => ({
   useTodos: jest.fn(),
 }));
 
