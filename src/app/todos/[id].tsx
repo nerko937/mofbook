@@ -23,7 +23,7 @@ export default function TodoDetails() {
 
   const [newItemText, setNewItemText] = useState('');
   const { itemsWithGroups, addItem } = useTodoItems(safeId);
-  const { fetchedGroups } = useTodoGroups(safeId)
+  const { fetchedGroups, addTodoGroup } = useTodoGroups(safeId)
 
   const groups = fetchedGroups ?? [];
 
@@ -46,6 +46,12 @@ export default function TodoDetails() {
     setNewItemText('');
   };
 
+  const handleAddGroup = async () => {
+    if (groups.length >= 10) return;
+    const newGroup = await addTodoGroup({todoId: safeId, position: groups.length + 1})
+    setSelectedGroup(newGroup)
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
@@ -64,6 +70,7 @@ export default function TodoDetails() {
             />
           ))
         )}
+        <Button title="Add group" onPress={handleAddGroup} />
         <TextInput
           style={styles.input}
           placeholder="Add a new item..."

@@ -1,6 +1,6 @@
 import { eq, max } from 'drizzle-orm';
 import { db } from '@/db/client';
-import { todos, todoGroups, todoItems } from '@/db/schema';
+import { todos, todoGroups, todoItems, type TodoGroup } from '@/db/schema';
 
 export function todosListQuery() {
   return db.select().from(todos).orderBy(todos.createdAt);
@@ -26,10 +26,18 @@ export function todoGroupsForTodoQuery(todoId: number) {
     .orderBy(todoGroups.position);
 }
 
-export async function addTodoGroup(todoId: number, position: number) {
-  await db.insert(todoGroups).values({
-    todoId: todoId, position: position
-  })
+export async function addTodoGroup(input: {
+  todoId: number;
+  position: number;
+}): Promise<TodoGroup> {
+  const [group] = await db
+    .insert(todoGroups)
+    .values({ todoId: input.todoId, position: input.position })
+    .returning();
+  if (!group) {
+    throw new Error('insert todo group returned no row');
+  }
+  return group;
 }
 
 /** Primary `from` is todo_items — live query refreshes on item inserts/updates. */
