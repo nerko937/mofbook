@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'expo-router';
 import { useTodos } from '@/hooks/useTodos';
 
-export default function App() {
+export default function Index() {
   const [newTodoName, setNewTodoName] = useState('');
   const { fetchedTodos, addTodo } = useTodos();
 

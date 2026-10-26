@@ -1,6 +1,6 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 import { useTodos } from '@/hooks/useTodos';
-import App from '@/app/index';
+import Index from '@/app/index';
 
 jest.mock('@/hooks/useTodos', () => ({
   useTodos: jest.fn(),
@@ -8,7 +8,7 @@ jest.mock('@/hooks/useTodos', () => ({
 
 const mockUseTodos = jest.mocked(useTodos);
 
-describe('<App />', () => {
+describe('<Index />', () => {
   beforeEach(() => {
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
@@ -24,7 +24,7 @@ describe('<App />', () => {
     });
 
     const user = userEvent.setup();
-    await render(<App />);
+    await render(<Index />);
     expect(screen.queryAllByTestId('todo-row')).toHaveLength(0);
 
     await user.type(screen.getByTestId('todo-input'), 'new todo');
@@ -39,7 +39,7 @@ describe('<App />', () => {
       addTodo: jest.fn(),
     });
 
-    await render(<App />);
+    await render(<Index />);
     const todoRow = screen.getByTestId('todo-row');
     expect(todoRow).toHaveTextContent('new todo');
     expect(todoRow).toHaveProp('href', '/todos/42');
