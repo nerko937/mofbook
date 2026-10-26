@@ -4,7 +4,20 @@ import { useLocalSearchParams } from 'expo-router';
 import type { TodoGroup } from '../../db/schema';
 import { useTodoItems } from '@/hooks/useTodoItems';
 
-export default function App() {
+const colors = [
+  "#3B82F6",
+  "#22C55E",
+  "#EF4444",
+  "#F59E0B",
+  "#8B5CF6",
+  "#F97316",
+  "#14B8A6",
+  "#334155",
+  "#F1F5F9",
+  "#FFFFFF",
+]
+
+export default function TodoDetails() {
   const { id } = useLocalSearchParams();
   const safeId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
@@ -34,17 +47,15 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text>Selected group: {selectedGroup?.id}</Text>
-      </View>
       <View style={styles.inputContainer}>
         {groupSelectIsOpen ? (
-          <Button title="Group" onPress={() => setGroupSelectIsOpen(false)} />
+          <Button title="Group" color={colors[selectedGroup?.position ?? 0]} onPress={() => setGroupSelectIsOpen(false)} />
         ) : (
           uniqueGroups.map((group) => (
             <Button
+              title="Swtich to"
               key={group.id}
-              title={String(group.id)}
+              color={colors[group.position]}
               onPress={() => {
                 setSelectedGroup(group);
                 setGroupSelectIsOpen(true);
@@ -67,8 +78,9 @@ export default function App() {
         keyExtractor={(row) => `item-${row.item.id}`}
         renderItem={({ item: row }) => (
           <View style={styles.row}>
+            <Text style={{color: colors[row.group.position]}}>■ </Text>
             <Text style={styles.text}>
-              {`${row.group.id} | ${row.item.content}`}
+              {row.item.content}
             </Text>
           </View>
         )}
@@ -105,6 +117,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   row: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
