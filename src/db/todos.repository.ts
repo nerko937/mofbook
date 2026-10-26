@@ -17,7 +17,6 @@ export async function addTodo(name: string) {
   await db.insert(todoGroups).values({ todoId: id, position: 1 });
 }
 
-/** Primary `from` is todo_groups — live query refreshes on group changes. */
 export function todoGroupsForTodoQuery(todoId: number) {
   return db
     .select()
@@ -40,7 +39,6 @@ export async function addTodoGroup(input: {
   return group;
 }
 
-/** Primary `from` is todo_items — live query refreshes on item inserts/updates. */
 export function todoItemsWithGroupsQuery(todoId: number) {
   return db
     .select({
