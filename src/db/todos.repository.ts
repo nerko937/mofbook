@@ -1,6 +1,6 @@
-import { eq, max, inArray } from 'drizzle-orm';
-import { db } from '@/db/client';
-import { todos, todoGroups, todoItems, type TodoGroup } from '@/db/schema';
+import { eq, max, inArray } from "drizzle-orm";
+import { db } from "@/db/client";
+import { todos, todoGroups, todoItems, type TodoGroup } from "@/db/schema";
 
 export function todosListQuery() {
   return db.select().from(todos).orderBy(todos.createdAt);
@@ -26,7 +26,7 @@ export function todoGroupsForTodoQuery(todoId: number) {
 }
 
 export async function deleteTodo(todoId: number) {
-  await db.delete(todos).where(eq(todos.id, todoId))
+  await db.delete(todos).where(eq(todos.id, todoId));
 }
 
 export async function addTodoGroup(input: {
@@ -38,7 +38,7 @@ export async function addTodoGroup(input: {
     .values({ todoId: input.todoId, position: input.position })
     .returning();
   if (!group) {
-    throw new Error('insert todo group returned no row');
+    throw new Error("insert todo group returned no row");
   }
   return group;
 }
@@ -72,5 +72,5 @@ export async function addTodoItem(input: { groupId: number; content: string }) {
 }
 
 export async function deleteTodoItems(todoIds: number[]) {
-  await db.delete(todoItems).where(inArray(todoItems.id, todoIds))
+  await db.delete(todoItems).where(inArray(todoItems.id, todoIds));
 }

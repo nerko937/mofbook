@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { Text, View } from 'react-native';
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
-import migrations from '../db/drizzle/migrations';
-import { db } from '@/db/client';
+import { useEffect } from "react";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { Text, View } from "react-native";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import migrations from "../db/drizzle/migrations";
+import { db } from "@/db/client";
 
 // Prevent the splash screen from auto-hiding while we migrate the database
 SplashScreen.preventAutoHideAsync();
@@ -29,11 +29,13 @@ export default function RootLayout() {
 
   // Render nothing while migrations are running; the Splash Screen covers this
   if (!success) {
-    return null; 
+    return null;
   }
 
-  return <Stack>
-    <Stack.Screen name='index'/>
-    <Stack.Screen name='todos/[id]'/>
-  </Stack>
+  return (
+    <Stack>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="todos/[id]" />
+    </Stack>
+  );
 }

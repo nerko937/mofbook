@@ -9,4 +9,4 @@ export const groupColors = [
   "#334155",
   "#F1F5F9",
   "#FFFFFF",
-]
+];

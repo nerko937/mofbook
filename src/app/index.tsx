@@ -1,15 +1,22 @@
-import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import { useState } from 'react';
-import { Link } from 'expo-router';
-import { useTodos } from '@/hooks/todos';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+} from "react-native";
+import { useState } from "react";
+import { Link } from "expo-router";
+import { useTodos } from "@/hooks/todos";
 
 export default function Index() {
-  const [newTodoName, setNewTodoName] = useState('');
+  const [newTodoName, setNewTodoName] = useState("");
   const { fetchedTodos, addTodo } = useTodos();
 
   const handleAddTodo = async () => {
     await addTodo(newTodoName);
-    setNewTodoName('');
+    setNewTodoName("");
   };
 
   return (
@@ -20,7 +27,9 @@ export default function Index() {
         data={fetchedTodos}
         keyExtractor={(todo) => {
           if (!todo.id) {
-            throw new Error(`Todo doesn't have id, item data: ${JSON.stringify(todo)}`);
+            throw new Error(
+              `Todo doesn't have id, item data: ${JSON.stringify(todo)}`,
+            );
           }
           return todo.id.toString();
         }}
@@ -29,7 +38,7 @@ export default function Index() {
             testID="todo-row"
             style={styles.row}
             href={{
-              pathname: '/todos/[id]',
+              pathname: "/todos/[id]",
               params: { id: item.id },
             }}
             asChild
@@ -56,24 +65,24 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: 60,
     paddingHorizontal: 20,
   },
   header: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -83,7 +92,7 @@ const styles = StyleSheet.create({
   row: {
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   text: {
     fontSize: 16,

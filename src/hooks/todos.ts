@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { useRef } from "react";
+import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import {
   addTodo,
   addTodoGroup,
@@ -8,8 +8,8 @@ import {
   todoItemsWithGroupsQuery,
   todosListQuery,
   deleteTodoItems,
-  deleteTodo
-} from '@/db/todos.repository';
+  deleteTodo,
+} from "@/db/todos.repository";
 
 export function useTodos() {
   const { data: fetchedTodos } = useLiveQuery(todosListQuery());
@@ -17,17 +17,19 @@ export function useTodos() {
   return {
     fetchedTodos,
     addTodo,
-    deleteTodo
+    deleteTodo,
   };
 }
 
 export function useTodoGroups(todoId: number) {
-  const { data: fetchedGroups } = useLiveQuery(todoGroupsForTodoQuery(todoId), [todoId]);
+  const { data: fetchedGroups } = useLiveQuery(todoGroupsForTodoQuery(todoId), [
+    todoId,
+  ]);
 
   return {
     fetchedGroups,
     addTodoGroup,
-  }
+  };
 }
 
 export function useTodoItems(todoId: number) {
