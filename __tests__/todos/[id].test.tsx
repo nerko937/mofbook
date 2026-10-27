@@ -24,6 +24,7 @@ describe('<TodoDetails />', () => {
     mockUseTodoItems.mockReturnValue({
       itemsWithGroups: [],
       addTodoItem: jest.fn(),
+      deleteTodoItems: jest.fn()
     });
   });
 
@@ -32,6 +33,7 @@ describe('<TodoDetails />', () => {
     mockUseTodoItems.mockReturnValue({
       itemsWithGroups: [],
       addTodoItem,
+      deleteTodoItems: jest.fn()
     });
 
     const user = userEvent.setup();
@@ -71,6 +73,7 @@ describe('<TodoDetails />', () => {
         }
       ],
       addTodoItem: jest.fn(),
+      deleteTodoItems: jest.fn()
     });
 
     await render(<TodoDetails />);
@@ -84,6 +87,11 @@ describe('<TodoDetails />', () => {
     expect(colors).toHaveLength(2)
     expect(colors[0]).toHaveStyle({color: groupColors[0]})
     expect(colors[1]).toHaveStyle({color: groupColors[1]})
+
+    const checkboxes = screen.getAllByTestId('todo-item-chbox')
+    expect(checkboxes).toHaveLength(2)
+    expect(checkboxes[0]).not.toBeChecked()
+    expect(checkboxes[1]).not.toBeChecked()
   })
 
   test('adding new group', async () => {
@@ -98,5 +106,38 @@ describe('<TodoDetails />', () => {
 
     await user.press(screen.getByTestId('add-group-btn'))
     expect(addTodoGroup).toHaveBeenCalled()
+  })
+
+  test('deleting todo items', async () => {
+    const deleteTodoItems = jest.fn()
+    mockUseTodoItems.mockReturnValue({
+      itemsWithGroups: [
+        {
+          item: { id: 1, groupId: 1, content: "todo 1", position: 1},
+          group: { id: 1, todoId: 1, position: 1 }
+        },
+        {
+          item: { id: 2, groupId: 2, content: "todo 2", position: 2},
+          group: { id: 2, todoId: 1, position: 2 }
+        },
+        {
+          item: { id: 3, groupId: 3, content: "todo 3", position: 3},
+          group: { id: 3, todoId: 1, position: 3 }
+        }
+      ],
+      addTodoItem: jest.fn(),
+      deleteTodoItems: deleteTodoItems
+    });
+
+    const user = userEvent.setup();
+    await render(<TodoDetails />);
+
+    expect(screen.queryByTestId('delete-checked-items-btn')).toBe(null)
+
+    const checkboxes = screen.getAllByTestId('todo-item-chbox')
+    await user.press(checkboxes[0])
+    await user.press(checkboxes[1])
+    await user.press(screen.getByTestId('delete-checked-items-btn'))
+    expect(deleteTodoItems).toHaveBeenCalledWith([1, 2])
   })
 })

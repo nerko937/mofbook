@@ -4,13 +4,14 @@ import { useLocalSearchParams } from 'expo-router';
 import type { TodoGroup } from '../../db/schema';
 import { useTodoGroups, useTodoItems } from '@/hooks/todos';
 import { groupColors }  from '../groupColors'
+import Checkbox from 'expo-checkbox';
 
 export default function TodoDetails() {
   const { id } = useLocalSearchParams();
   const safeId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
   const [newItemText, setNewItemText] = useState('');
-  const { itemsWithGroups, addTodoItem } = useTodoItems(safeId);
+  const { itemsWithGroups, addTodoItem, deleteTodoItems } = useTodoItems(safeId);
   const { fetchedGroups, addTodoGroup } = useTodoGroups(safeId)
 
   const groups = fetchedGroups ?? [];
@@ -40,8 +41,24 @@ export default function TodoDetails() {
     setSelectedGroup(newGroup)
   }
 
+  const [checkedIds, setCheckedIds] = useState<number[]>([])
+  const toggleChecked = (itemId: number) => {
+    if (checkedIds.includes(itemId)) {
+      setCheckedIds(checkedIds.filter((id) => id != itemId))
+    } else {
+      setCheckedIds([...checkedIds, itemId])
+    }
+  };
+
   return (
     <View style={styles.container}>
+      <Button testID='delete-todo-btn' title='Delete whole todo' />
+      {checkedIds.length > 0 ? (
+        <View>
+          <Text>Selected items: {checkedIds.length}</Text>
+          <Button testID='delete-checked-items-btn' title='Delete' onPress={() => { deleteTodoItems(checkedIds); setCheckedIds([]); }} />
+        </View>
+      ) : undefined}
       <View style={styles.inputContainer}>
         {groupSelectIsOpen ? (
           <Button testID='change-group-btn' title="Group" color={groupColors[(selectedGroup?.position ?? 1) - 1]} onPress={() => setGroupSelectIsOpen(false)} />
@@ -76,6 +93,7 @@ export default function TodoDetails() {
         keyExtractor={(row) => `item-${row.item.id}`}
         renderItem={({ item: row }) => (
           <View style={styles.row}>
+            <Checkbox testID='todo-item-chbox' value={checkedIds.includes(row.item.id)} onValueChange={() => toggleChecked(row.item.id)} />
             <Text testID='todo-item-color' style={{color: groupColors[row.group.position - 1]}}>■ </Text>
             <Text testID='todo-item-content' style={styles.text}>
               {row.item.content}

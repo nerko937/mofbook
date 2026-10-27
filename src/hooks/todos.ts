@@ -7,6 +7,7 @@ import {
   todoGroupsForTodoQuery,
   todoItemsWithGroupsQuery,
   todosListQuery,
+  deleteTodoItems,
 } from '@/db/todos.repository';
 
 export function useTodos() {
@@ -48,5 +49,6 @@ export function useTodoItems(todoId: number) {
   return {
     itemsWithGroups,
     addTodoItem,
+    deleteTodoItems,
   };
 }

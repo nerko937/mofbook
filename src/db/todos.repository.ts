@@ -1,4 +1,4 @@
-import { eq, max } from 'drizzle-orm';
+import { eq, max, inArray } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { todos, todoGroups, todoItems, type TodoGroup } from '@/db/schema';
 
@@ -65,4 +65,8 @@ export async function addTodoItem(input: { groupId: number; content: string }) {
     content: trimmed,
     position: (maxPos ?? 0) + 1,
   });
+}
+
+export async function deleteTodoItems(todoIds: number[]) {
+  await db.delete(todoItems).where(inArray(todoItems.id, todoIds))
 }
