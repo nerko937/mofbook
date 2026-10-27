@@ -3,26 +3,14 @@ import { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import type { TodoGroup } from '../../db/schema';
 import { useTodoGroups, useTodoItems } from '@/hooks/todos';
-
-const colors = [
-  "#3B82F6",
-  "#22C55E",
-  "#EF4444",
-  "#F59E0B",
-  "#8B5CF6",
-  "#F97316",
-  "#14B8A6",
-  "#334155",
-  "#F1F5F9",
-  "#FFFFFF",
-]
+import { groupColors }  from '../groupColors'
 
 export default function TodoDetails() {
   const { id } = useLocalSearchParams();
   const safeId = Array.isArray(id) ? Number(id[0]) : Number(id);
 
   const [newItemText, setNewItemText] = useState('');
-  const { itemsWithGroups, addItem } = useTodoItems(safeId);
+  const { itemsWithGroups, addTodoItem } = useTodoItems(safeId);
   const { fetchedGroups, addTodoGroup } = useTodoGroups(safeId)
 
   const groups = fetchedGroups ?? [];
@@ -39,7 +27,7 @@ export default function TodoDetails() {
   const handleAddItem = async () => {
     if (!newItemText.trim() || !selectedGroup) return;
 
-    await addItem({
+    await addTodoItem({
       groupId: selectedGroup.id,
       content: newItemText,
     });
@@ -56,13 +44,14 @@ export default function TodoDetails() {
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         {groupSelectIsOpen ? (
-          <Button title="Group" color={colors[selectedGroup?.position ?? 0]} onPress={() => setGroupSelectIsOpen(false)} />
+          <Button testID='change-group-btn' title="Group" color={groupColors[(selectedGroup?.position ?? 1) - 1]} onPress={() => setGroupSelectIsOpen(false)} />
         ) : (
           groups.map((group) => (
             <Button
+              testID='select-group-btn'
               title="Swtich to"
               key={group.id}
-              color={colors[group.position]}
+              color={groupColors[group.position - 1]}
               onPress={() => {
                 setSelectedGroup(group);
                 setGroupSelectIsOpen(true);
@@ -70,15 +59,16 @@ export default function TodoDetails() {
             />
           ))
         )}
-        <Button title="Add group" onPress={handleAddGroup} />
+        <Button testID='add-group-btn' title="Add group" onPress={handleAddGroup} />
         <TextInput
           style={styles.input}
+          testID='todo-item-input'
           placeholder="Add a new item..."
           value={newItemText}
           onChangeText={setNewItemText}
           onSubmitEditing={handleAddItem}
         />
-        <Button title="Add" onPress={handleAddItem} />
+        <Button title="Add" testID='todo-item-btn-add' onPress={handleAddItem} />
       </View>
 
       <FlatList
@@ -86,8 +76,8 @@ export default function TodoDetails() {
         keyExtractor={(row) => `item-${row.item.id}`}
         renderItem={({ item: row }) => (
           <View style={styles.row}>
-            <Text style={{color: colors[row.group.position]}}>■ </Text>
-            <Text style={styles.text}>
+            <Text testID='todo-item-color' style={{color: groupColors[row.group.position - 1]}}>■ </Text>
+            <Text testID='todo-item-content' style={styles.text}>
               {row.item.content}
             </Text>
           </View>

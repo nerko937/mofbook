@@ -35,7 +35,7 @@ export function useTodoItems(todoId: number) {
 
   const addingRef = useRef(false);
 
-  const addItem = async (input: { groupId: number; content: string }) => {
+  const addTodoItem = async (input: { groupId: number; content: string }) => {
     if (addingRef.current) return;
     addingRef.current = true;
     try {
@@ -47,6 +47,6 @@ export function useTodoItems(todoId: number) {
 
   return {
     itemsWithGroups,
-    addItem,
+    addTodoItem,
   };
 }
