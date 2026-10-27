@@ -3,11 +3,12 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import {
   addTodo,
   addTodoGroup,
-  addTodoItem,
+  addTodoItem as addTodoItemToDb,
   todoGroupsForTodoQuery,
   todoItemsWithGroupsQuery,
   todosListQuery,
   deleteTodoItems,
+  deleteTodo
 } from '@/db/todos.repository';
 
 export function useTodos() {
@@ -16,6 +17,7 @@ export function useTodos() {
   return {
     fetchedTodos,
     addTodo,
+    deleteTodo
   };
 }
 
@@ -40,7 +42,7 @@ export function useTodoItems(todoId: number) {
     if (addingRef.current) return;
     addingRef.current = true;
     try {
-      await addTodoItem(input);
+      await addTodoItemToDb(input);
     } finally {
       addingRef.current = false;
     }

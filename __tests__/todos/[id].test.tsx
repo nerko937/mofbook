@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
-import { useTodoGroups, useTodoItems } from '@/hooks/todos';
+import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
 import TodoDetails from '@/app/todos/[id]';
 import { groupColors }  from '@/app/groupColors'
 
@@ -8,15 +8,22 @@ jest.mock('expo-router', () => ({
 }));
 
 jest.mock('@/hooks/todos', () => ({
+  useTodos: jest.fn(),
   useTodoGroups: jest.fn(),
   useTodoItems: jest.fn(),
 }));
 
+const mockUseTodos = jest.mocked(useTodos)
 const mockUseTodoGroups = jest.mocked(useTodoGroups);
 const mockUseTodoItems = jest.mocked(useTodoItems);
 
 describe('<TodoDetails />', () => {
   beforeEach(() => {
+    mockUseTodos.mockReturnValue({
+      fetchedTodos: [],
+      addTodo: jest.fn(),
+      deleteTodo: jest.fn(),
+    });
     mockUseTodoGroups.mockReturnValue({
       fetchedGroups: [{ id: 1, todoId: 1, position: 1 }, { id: 2, todoId: 1, position: 2 }],
       addTodoGroup: jest.fn(),

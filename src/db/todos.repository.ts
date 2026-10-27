@@ -25,6 +25,10 @@ export function todoGroupsForTodoQuery(todoId: number) {
     .orderBy(todoGroups.position);
 }
 
+export async function deleteTodo(todoId: number) {
+  await db.delete(todos).where(eq(todos.id, todoId))
+}
+
 export async function addTodoGroup(input: {
   todoId: number;
   position: number;

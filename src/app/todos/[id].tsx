@@ -1,8 +1,9 @@
-import { FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { Modal, FlatList, StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { router } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import type { TodoGroup } from '../../db/schema';
-import { useTodoGroups, useTodoItems } from '@/hooks/todos';
+import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
 import { groupColors }  from '../groupColors'
 import Checkbox from 'expo-checkbox';
 
@@ -50,9 +51,22 @@ export default function TodoDetails() {
     }
   };
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const { deleteTodo } = useTodos()
+
   return (
     <View style={styles.container}>
-      <Button testID='delete-todo-btn' title='Delete whole todo' />
+      <Button testID='delete-todo-btn' title='Delete whole todo' onPress={() => setDeleteModalOpen(true)} />
+        <Modal
+          transparent={true}
+          visible={deleteModalOpen}
+          onRequestClose={() => {
+            setDeleteModalOpen(false);
+        }}>
+          <Text>Are you sure?</Text>
+          <Button testID='delete-todo-confirm-btn' title='Yes' onPress={() => {deleteTodo(safeId); router.replace('/')}} />
+          <Button testID='delete-todo-confirm-btn' title='No' onPress={() => setDeleteModalOpen(false)} />
+        </Modal>
       {checkedIds.length > 0 ? (
         <View>
           <Text>Selected items: {checkedIds.length}</Text>
