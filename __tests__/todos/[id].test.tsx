@@ -1,10 +1,14 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
 import TodoDetails from '@/app/todos/[id]';
-import { groupColors }  from '@/app/groupColors'
+import { groupColors } from '@/groupColors'
+import { router } from 'expo-router';
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({ id: '1' })),
+  router: {
+    replace: jest.fn(),
+  },
 }));
 
 jest.mock('@/hooks/todos', () => ({
@@ -19,6 +23,7 @@ const mockUseTodoItems = jest.mocked(useTodoItems);
 
 describe('<TodoDetails />', () => {
   beforeEach(() => {
+    jest.mocked(router.replace).mockClear();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
       addTodo: jest.fn(),
@@ -111,8 +116,9 @@ describe('<TodoDetails />', () => {
     const user = userEvent.setup();
     await render(<TodoDetails />);
 
-    await user.press(screen.getByTestId('add-group-btn'))
-    expect(addTodoGroup).toHaveBeenCalled()
+    await user.press(screen.getByTestId('change-group-btn'));
+    await user.press(screen.getByTestId('add-group-btn'));
+    expect(addTodoGroup).toHaveBeenCalledWith({ todoId: 1, position: 2 });
   })
 
   test('deleting todo items', async () => {
@@ -146,5 +152,27 @@ describe('<TodoDetails />', () => {
     await user.press(checkboxes[1])
     await user.press(screen.getByTestId('delete-checked-items-btn'))
     expect(deleteTodoItems).toHaveBeenCalledWith([1, 2])
+  })
+
+  test('delete todo', async () => {
+    const deleteTodo = jest.fn()
+    mockUseTodos.mockReturnValue({
+      fetchedTodos: [],
+      addTodo: jest.fn(),
+      deleteTodo: deleteTodo,
+    });
+
+    const user = userEvent.setup()
+    await render(<TodoDetails />)
+
+    const openDeleteModal = screen.getByTestId('delete-todo-btn')
+    await user.press(openDeleteModal)
+    await user.press(screen.getByTestId('delete-todo-dismiss-btn'))
+    expect(deleteTodo).not.toHaveBeenCalled()
+
+    await user.press(openDeleteModal)
+    await user.press(screen.getByTestId('delete-todo-confirm-btn'))
+    expect(deleteTodo).toHaveBeenCalledWith(1)
+    expect(router.replace).toHaveBeenCalledWith('/')
   })
 })

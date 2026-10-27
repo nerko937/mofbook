@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import type { TodoGroup } from '../../db/schema';
 import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
-import { groupColors }  from '../groupColors'
+import { groupColors } from '@/groupColors'
 import Checkbox from 'expo-checkbox';
 
 export default function TodoDetails() {
@@ -18,12 +18,11 @@ export default function TodoDetails() {
   const groups = fetchedGroups ?? [];
 
   const [selectedGroup, setSelectedGroup] = useState<TodoGroup | undefined>();
-  const [groupSelectIsOpen, setGroupSelectIsOpen] = useState(false);
+  const [groupSelectModalOpen, setGroupSelectModalOpen] = useState(false);
   useEffect(() => {
     if (selectedGroup) return;
     if (!fetchedGroups?.length) return;
     setSelectedGroup(fetchedGroups[0]);
-    setGroupSelectIsOpen(true);
   }, [fetchedGroups, selectedGroup]);
 
   const handleAddItem = async () => {
@@ -65,7 +64,7 @@ export default function TodoDetails() {
         }}>
           <Text>Are you sure?</Text>
           <Button testID='delete-todo-confirm-btn' title='Yes' onPress={() => {deleteTodo(safeId); router.replace('/')}} />
-          <Button testID='delete-todo-confirm-btn' title='No' onPress={() => setDeleteModalOpen(false)} />
+          <Button testID='delete-todo-dismiss-btn' title='No' onPress={() => setDeleteModalOpen(false)} />
         </Modal>
       {checkedIds.length > 0 ? (
         <View>
@@ -74,10 +73,15 @@ export default function TodoDetails() {
         </View>
       ) : undefined}
       <View style={styles.inputContainer}>
-        {groupSelectIsOpen ? (
-          <Button testID='change-group-btn' title="Group" color={groupColors[(selectedGroup?.position ?? 1) - 1]} onPress={() => setGroupSelectIsOpen(false)} />
-        ) : (
-          groups.map((group) => (
+        <Button testID='change-group-btn' title="Group" color={groupColors[(selectedGroup?.position ?? 1) - 1]} onPress={() => setGroupSelectModalOpen(true)} />
+        <Modal
+          transparent={true}
+          visible={groupSelectModalOpen}
+          onRequestClose={() => {
+            setGroupSelectModalOpen(false);
+        }}>
+          <Button testID='add-group-btn' title="Add group" onPress={handleAddGroup} />
+          {groups.map((group) => (
             <Button
               testID='select-group-btn'
               title="Swtich to"
@@ -85,12 +89,11 @@ export default function TodoDetails() {
               color={groupColors[group.position - 1]}
               onPress={() => {
                 setSelectedGroup(group);
-                setGroupSelectIsOpen(true);
+                setGroupSelectModalOpen(false);
               }}
             />
-          ))
-        )}
-        <Button testID='add-group-btn' title="Add group" onPress={handleAddGroup} />
+          ))}
+        </Modal>
         <TextInput
           style={styles.input}
           testID='todo-item-input'
