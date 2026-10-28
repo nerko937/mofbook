@@ -2,7 +2,7 @@ import { eq, max, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import { todos, todoGroups, todoItems, type TodoGroup } from "@/db/schema";
 
-export function todosListQuery() {
+export function getTodosQuery() {
   return db.select().from(todos).orderBy(todos.createdAt);
 }
 
@@ -10,14 +10,17 @@ export async function addTodo(name: string) {
   const trimmed = name.trim();
   if (!trimmed) return;
 
-  const [{ id }] = await db
-    .insert(todos)
-    .values({ name: trimmed })
-    .returning({ id: todos.id });
-  await db.insert(todoGroups).values({ todoId: id, position: 1 });
+  await db.transaction(async (tx) => {
+    const [{ id }] = await tx
+      .insert(todos)
+      .values({ name: trimmed })
+      .returning({ id: todos.id });
+
+    await tx.insert(todoGroups).values({ todoId: id, position: 1 });
+  });
 }
 
-export function todoGroupsForTodoQuery(todoId: number) {
+export function getTodoGroupsQuery(todoId: number) {
   return db
     .select()
     .from(todoGroups)
@@ -43,7 +46,7 @@ export async function addTodoGroup(input: {
   return group;
 }
 
-export function todoItemsWithGroupsQuery(todoId: number) {
+export function getTodoItemsQuery(todoId: number) {
   return db
     .select({
       item: todoItems,
@@ -71,6 +74,6 @@ export async function addTodoItem(input: { groupId: number; content: string }) {
   });
 }
 
-export async function deleteTodoItems(todoIds: number[]) {
-  await db.delete(todoItems).where(inArray(todoItems.id, todoIds));
+export async function deleteTodoItems(itemIds: number[]) {
+  await db.delete(todoItems).where(inArray(todoItems.id, itemIds));
 }

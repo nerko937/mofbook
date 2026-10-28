@@ -1,5 +1,6 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 import { useTodos } from '@/hooks/todos';
+import { Link } from 'expo-router';
 import Index from '@/app/index';
 
 jest.mock('@/hooks/todos', () => ({
@@ -17,7 +18,7 @@ describe('<Index />', () => {
     });
   });
 
-  test('calls addTodo when user adds a todo', async () => {
+  test('add todo', async () => {
     const addTodo = jest.fn();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
@@ -36,15 +37,19 @@ describe('<Index />', () => {
   });
 
   test('renders todos from the hook and has correct href', async () => {
+    const todo = { id: 42, name: 'new todo', createdAt: '2026-01-01' };
     mockUseTodos.mockReturnValue({
-      fetchedTodos: [{ id: 42, name: 'new todo', createdAt: '2026-01-01' }],
+      fetchedTodos: [todo],
       addTodo: jest.fn(),
       deleteTodo: jest.fn(),
     });
-
     await render(<Index />);
-    const todoRow = screen.getByTestId('todo-row');
-    expect(todoRow).toHaveTextContent('new todo');
-    expect(todoRow).toHaveProp('href', '/todos/42');
+    expect(screen.getByTestId('todo-row')).toHaveTextContent('new todo');
+    expect(
+      Link.resolveHref({
+        pathname: '/todos/[id]',
+        params: { id: todo.id },
+      }),
+    ).toBe('/todos/42');
   });
 });

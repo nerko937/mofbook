@@ -23,6 +23,7 @@ const mockUseTodoItems = jest.mocked(useTodoItems);
 
 describe('<TodoDetails />', () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     jest.mocked(router.replace).mockClear();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
@@ -34,7 +35,7 @@ describe('<TodoDetails />', () => {
       addTodoGroup: jest.fn(),
     });
     mockUseTodoItems.mockReturnValue({
-      itemsWithGroups: [],
+      fetchedItems: [],
       addTodoItem: jest.fn(),
       deleteTodoItems: jest.fn()
     });
@@ -43,7 +44,7 @@ describe('<TodoDetails />', () => {
   test('adding todo items', async () => {
     const addTodoItem = jest.fn();
     mockUseTodoItems.mockReturnValue({
-      itemsWithGroups: [],
+      fetchedItems: [],
       addTodoItem,
       deleteTodoItems: jest.fn()
     });
@@ -60,8 +61,8 @@ describe('<TodoDetails />', () => {
       content: 'todo 1',
     });
 
-    await user.press(screen.getByTestId('change-group-btn'))
-    await user.press(screen.getAllByTestId('select-group-btn')[1])
+    await user.press(screen.getByTestId('todo-group-btn-change'))
+    await user.press(screen.getAllByTestId('todo-group-btn-select')[1])
 
     await user.type(screen.getByTestId('todo-item-input'), 'todo 2');
     await user.press(screen.getByTestId('todo-item-btn-add'));
@@ -74,7 +75,7 @@ describe('<TodoDetails />', () => {
 
   test('renders todo items with groups from the hook', async () => {
     mockUseTodoItems.mockReturnValue({
-      itemsWithGroups: [
+      fetchedItems: [
         {
           item: { id: 1, groupId: 1, content: "todo 1", position: 1},
           group: { id: 1, todoId: 1, position: 1 }
@@ -116,15 +117,15 @@ describe('<TodoDetails />', () => {
     const user = userEvent.setup();
     await render(<TodoDetails />);
 
-    await user.press(screen.getByTestId('change-group-btn'));
-    await user.press(screen.getByTestId('add-group-btn'));
+    await user.press(screen.getByTestId('todo-group-btn-change'));
+    await user.press(screen.getByTestId('todo-group-btn-add'));
     expect(addTodoGroup).toHaveBeenCalledWith({ todoId: 1, position: 2 });
   })
 
   test('deleting todo items', async () => {
     const deleteTodoItems = jest.fn()
     mockUseTodoItems.mockReturnValue({
-      itemsWithGroups: [
+      fetchedItems: [
         {
           item: { id: 1, groupId: 1, content: "todo 1", position: 1},
           group: { id: 1, todoId: 1, position: 1 }
@@ -145,12 +146,12 @@ describe('<TodoDetails />', () => {
     const user = userEvent.setup();
     await render(<TodoDetails />);
 
-    expect(screen.queryByTestId('delete-checked-items-btn')).toBe(null)
+    expect(screen.queryByTestId('delete-items-btn-del-checked')).toBe(null)
 
     const checkboxes = screen.getAllByTestId('todo-item-chbox')
     await user.press(checkboxes[0])
     await user.press(checkboxes[1])
-    await user.press(screen.getByTestId('delete-checked-items-btn'))
+    await user.press(screen.getByTestId('delete-items-btn-del-checked'))
     expect(deleteTodoItems).toHaveBeenCalledWith([1, 2])
   })
 
@@ -165,13 +166,13 @@ describe('<TodoDetails />', () => {
     const user = userEvent.setup()
     await render(<TodoDetails />)
 
-    const openDeleteModal = screen.getByTestId('delete-todo-btn')
+    const openDeleteModal = screen.getByTestId('delete-todo-btn-modal-opn')
     await user.press(openDeleteModal)
-    await user.press(screen.getByTestId('delete-todo-dismiss-btn'))
+    await user.press(screen.getByTestId('delete-todo-btn-dismiss'))
     expect(deleteTodo).not.toHaveBeenCalled()
 
     await user.press(openDeleteModal)
-    await user.press(screen.getByTestId('delete-todo-confirm-btn'))
+    await user.press(screen.getByTestId('delete-todo-btn-confirmation'))
     expect(deleteTodo).toHaveBeenCalledWith(1)
     expect(router.replace).toHaveBeenCalledWith('/')
   })

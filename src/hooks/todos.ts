@@ -4,15 +4,15 @@ import {
   addTodo,
   addTodoGroup,
   addTodoItem as addTodoItemToDb,
-  todoGroupsForTodoQuery,
-  todoItemsWithGroupsQuery,
-  todosListQuery,
+  getTodoGroupsQuery,
+  getTodoItemsQuery,
+  getTodosQuery,
   deleteTodoItems,
   deleteTodo,
 } from "@/db/todos.repository";
 
 export function useTodos() {
-  const { data: fetchedTodos } = useLiveQuery(todosListQuery());
+  const { data: fetchedTodos } = useLiveQuery(getTodosQuery());
 
   return {
     fetchedTodos,
@@ -22,7 +22,7 @@ export function useTodos() {
 }
 
 export function useTodoGroups(todoId: number) {
-  const { data: fetchedGroups } = useLiveQuery(todoGroupsForTodoQuery(todoId), [
+  const { data: fetchedGroups } = useLiveQuery(getTodoGroupsQuery(todoId), [
     todoId,
   ]);
 
@@ -33,10 +33,9 @@ export function useTodoGroups(todoId: number) {
 }
 
 export function useTodoItems(todoId: number) {
-  const { data: itemsWithGroups } = useLiveQuery(
-    todoItemsWithGroupsQuery(todoId),
-    [todoId],
-  );
+  const { data: fetchedItems } = useLiveQuery(getTodoItemsQuery(todoId), [
+    todoId,
+  ]);
 
   const addingRef = useRef(false);
 
@@ -51,7 +50,7 @@ export function useTodoItems(todoId: number) {
   };
 
   return {
-    itemsWithGroups,
+    fetchedItems,
     addTodoItem,
     deleteTodoItems,
   };

@@ -6,6 +6,8 @@ import {
   View,
   TextInput,
   Button,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -15,12 +17,11 @@ import { groupColors } from "@/groupColors";
 import { Checkbox } from "expo-checkbox";
 
 export default function TodoDetails() {
-  const { id } = useLocalSearchParams();
-  const safeId = Array.isArray(id) ? Number(id[0]) : Number(id);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const safeId = Number(id);
 
-  const [newItemText, setNewItemText] = useState("");
-  const { itemsWithGroups, addTodoItem, deleteTodoItems } =
-    useTodoItems(safeId);
+  const [newItemName, setNewItemName] = useState("");
+  const { fetchedItems, addTodoItem, deleteTodoItems } = useTodoItems(safeId);
   const { fetchedGroups, addTodoGroup } = useTodoGroups(safeId);
 
   const groups = fetchedGroups ?? [];
@@ -30,13 +31,13 @@ export default function TodoDetails() {
   const [groupSelectModalOpen, setGroupSelectModalOpen] = useState(false);
 
   const handleAddItem = async () => {
-    if (!newItemText.trim() || !resolvedSelectedGroup) return;
+    if (!newItemName.trim() || !resolvedSelectedGroup) return;
 
     await addTodoItem({
       groupId: resolvedSelectedGroup.id,
-      content: newItemText,
+      content: newItemName,
     });
-    setNewItemText("");
+    setNewItemName("");
   };
 
   const handleAddGroup = async () => {
@@ -61,50 +62,61 @@ export default function TodoDetails() {
   const { deleteTodo } = useTodos();
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <Button
-        testID="delete-todo-btn"
+        testID="delete-todo-btn-modal-opn"
         title="Delete whole todo"
+        color="red"
         onPress={() => setDeleteModalOpen(true)}
       />
       <Modal
         transparent={true}
         visible={deleteModalOpen}
-        onRequestClose={() => {
-          setDeleteModalOpen(false);
-        }}
+        onRequestClose={() => setDeleteModalOpen(false)}
       >
-        <Text>Are you sure?</Text>
-        <Button
-          testID="delete-todo-confirm-btn"
-          title="Yes"
-          onPress={() => {
-            deleteTodo(safeId);
-            router.replace("/");
-          }}
-        />
-        <Button
-          testID="delete-todo-dismiss-btn"
-          title="No"
-          onPress={() => setDeleteModalOpen(false)}
-        />
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Are you sure?</Text>
+            <Button
+              testID="delete-todo-btn-confirmation"
+              title="Yes, Delete"
+              color="red"
+              onPress={async () => {
+                await deleteTodo(safeId);
+                setDeleteModalOpen(false);
+                router.replace("/");
+              }}
+            />
+            <Button
+              testID="delete-todo-btn-dismiss"
+              title="Cancel"
+              onPress={() => setDeleteModalOpen(false)}
+            />
+          </View>
+        </View>
       </Modal>
-      {checkedIds.length > 0 ? (
-        <View>
+
+      {checkedIds.length > 0 && (
+        <View style={styles.selectionBar}>
           <Text>Selected items: {checkedIds.length}</Text>
           <Button
-            testID="delete-checked-items-btn"
-            title="Delete"
-            onPress={() => {
-              deleteTodoItems(checkedIds);
+            testID="delete-items-btn-del-checked"
+            title="Delete Selected"
+            color="red"
+            onPress={async () => {
+              await deleteTodoItems(checkedIds);
               setCheckedIds([]);
             }}
           />
         </View>
-      ) : undefined}
+      )}
+
       <View style={styles.inputContainer}>
         <Button
-          testID="change-group-btn"
+          testID="todo-group-btn-change"
           title="Group"
           color={groupColors[(resolvedSelectedGroup?.position ?? 1) - 1]}
           onPress={() => setGroupSelectModalOpen(true)}
@@ -112,34 +124,41 @@ export default function TodoDetails() {
         <Modal
           transparent={true}
           visible={groupSelectModalOpen}
-          onRequestClose={() => {
-            setGroupSelectModalOpen(false);
-          }}
+          onRequestClose={() => setGroupSelectModalOpen(false)}
         >
-          <Button
-            testID="add-group-btn"
-            title="Add group"
-            onPress={handleAddGroup}
-          />
-          {groups.map((group) => (
-            <Button
-              testID="select-group-btn"
-              title="Swtich to"
-              key={group.id}
-              color={groupColors[group.position - 1]}
-              onPress={() => {
-                setSelectedGroup(group);
-                setGroupSelectModalOpen(false);
-              }}
-            />
-          ))}
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Button
+                testID="todo-group-btn-add"
+                title="Add group"
+                onPress={handleAddGroup}
+              />
+              {groups.map((group) => (
+                <Button
+                  testID="todo-group-btn-select"
+                  title={`Switch to Group ${group.position}`}
+                  key={group.id}
+                  color={groupColors[group.position - 1]}
+                  onPress={() => {
+                    setSelectedGroup(group);
+                    setGroupSelectModalOpen(false);
+                  }}
+                />
+              ))}
+              <Button
+                title="Cancel"
+                onPress={() => setGroupSelectModalOpen(false)}
+              />
+            </View>
+          </View>
         </Modal>
+
         <TextInput
           style={styles.input}
           testID="todo-item-input"
           placeholder="Add a new item..."
-          value={newItemText}
-          onChangeText={setNewItemText}
+          value={newItemName}
+          onChangeText={setNewItemName}
           onSubmitEditing={handleAddItem}
         />
         <Button
@@ -150,18 +169,22 @@ export default function TodoDetails() {
       </View>
 
       <FlatList
-        data={itemsWithGroups ?? []}
-        keyExtractor={(row) => `item-${row.item.id}`}
+        data={fetchedItems ?? []}
+        keyExtractor={(row) => row.item.id.toString()}
         renderItem={({ item: row }) => (
           <View style={styles.row}>
             <Checkbox
               testID="todo-item-chbox"
+              style={styles.checkbox}
               value={checkedIds.includes(row.item.id)}
               onValueChange={() => toggleChecked(row.item.id)}
             />
             <Text
               testID="todo-item-color"
-              style={{ color: groupColors[row.group.position - 1] }}
+              style={{
+                color: groupColors[row.group.position - 1],
+                fontSize: 20,
+              }}
             >
               ■{" "}
             </Text>
@@ -171,7 +194,7 @@ export default function TodoDetails() {
           </View>
         )}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -182,15 +205,38 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
   },
-  header: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 20,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    minWidth: 250,
+    gap: 10,
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  selectionBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  checkbox: {
+    marginRight: 10,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 10,
   },
   input: {
     flex: 1,
@@ -200,7 +246,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     fontSize: 16,
-    marginRight: 10,
+    marginHorizontal: 10,
   },
   row: {
     flexDirection: "row",

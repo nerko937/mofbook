@@ -5,6 +5,9 @@ import {
   View,
   TextInput,
   Button,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
 } from "react-native";
 import { useState } from "react";
 import { Link } from "expo-router";
@@ -20,30 +23,28 @@ export default function Index() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <Text style={styles.header}>Todos</Text>
 
       <FlatList
         data={fetchedTodos}
-        keyExtractor={(todo) => {
-          if (!todo.id) {
-            throw new Error(
-              `Todo doesn't have id, item data: ${JSON.stringify(todo)}`,
-            );
-          }
-          return todo.id.toString();
-        }}
+        keyExtractor={(todo) => todo.id.toString()}
         renderItem={({ item }) => (
           <Link
             testID="todo-row"
-            style={styles.row}
             href={{
               pathname: "/todos/[id]",
               params: { id: item.id },
             }}
             asChild
           >
-            <Text style={styles.text}>{item.name}</Text>
+            {/* Wrap in TouchableOpacity for mobile interaction feedback */}
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.text}>{item.name}</Text>
+            </TouchableOpacity>
           </Link>
         )}
       />
@@ -55,10 +56,11 @@ export default function Index() {
           value={newTodoName}
           onChangeText={setNewTodoName}
           onSubmitEditing={handleAddTodo}
+          placeholder="New Todo"
         />
         <Button testID="todo-btn-add" title="Add" onPress={handleAddTodo} />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

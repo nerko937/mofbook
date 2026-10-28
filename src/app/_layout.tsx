@@ -13,11 +13,11 @@ export default function RootLayout() {
   const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
-    if (success) {
+    if (success || error) {
       // Hide the splash screen once migrations are complete
       SplashScreen.hideAsync();
     }
-  }, [success]);
+  }, [success, error]);
 
   if (error) {
     return (
