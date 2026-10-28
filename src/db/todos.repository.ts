@@ -7,13 +7,10 @@ export function getTodosQuery() {
 }
 
 export async function addTodo(name: string) {
-  const trimmed = name.trim();
-  if (!trimmed) return;
-
   await db.transaction(async (tx) => {
     const [{ id }] = await tx
       .insert(todos)
-      .values({ name: trimmed })
+      .values({ name: name })
       .returning({ id: todos.id });
 
     await tx.insert(todoGroups).values({ todoId: id, position: 1 });
@@ -59,9 +56,6 @@ export function getTodoItemsQuery(todoId: number) {
 }
 
 export async function addTodoItem(input: { groupId: number; content: string }) {
-  const trimmed = input.content.trim();
-  if (!trimmed) return;
-
   const [{ maxPos }] = await db
     .select({ maxPos: max(todoItems.position) })
     .from(todoItems)
@@ -69,7 +63,7 @@ export async function addTodoItem(input: { groupId: number; content: string }) {
 
   await db.insert(todoItems).values({
     groupId: input.groupId,
-    content: trimmed,
+    content: input.content,
     position: (maxPos ?? 0) + 1,
   });
 }

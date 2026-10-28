@@ -53,8 +53,8 @@ describe('<TodoDetails />', () => {
     await render(<TodoDetails />);
     expect(screen.queryAllByTestId('todo-item-content')).toHaveLength(0);
 
-    await user.type(screen.getByTestId('todo-item-input'), 'todo 1');
-    await user.press(screen.getByTestId('todo-item-btn-add'));
+    await user.type(screen.getByTestId('common-submitter-input'), 'todo 1');
+    await user.press(screen.getByTestId('common-submitter-btn-add'));
 
     expect(addTodoItem).toHaveBeenCalledWith({
       groupId: 1,
@@ -64,8 +64,8 @@ describe('<TodoDetails />', () => {
     await user.press(screen.getByTestId('todo-group-btn-change'))
     await user.press(screen.getAllByTestId('todo-group-btn-select')[1])
 
-    await user.type(screen.getByTestId('todo-item-input'), 'todo 2');
-    await user.press(screen.getByTestId('todo-item-btn-add'));
+    await user.type(screen.getByTestId('common-submitter-input'), 'todo 2');
+    await user.press(screen.getByTestId('common-submitter-btn-add'));
 
     expect(addTodoItem).toHaveBeenCalledWith({
       groupId: 2,

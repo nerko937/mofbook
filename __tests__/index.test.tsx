@@ -30,8 +30,8 @@ describe('<Index />', () => {
     await render(<Index />);
     expect(screen.queryAllByTestId('todo-row')).toHaveLength(0);
 
-    await user.type(screen.getByTestId('todo-input'), 'new todo');
-    await user.press(screen.getByTestId('todo-btn-add'));
+    await user.type(screen.getByTestId('common-submitter-input'), 'new todo');
+    await user.press(screen.getByTestId('common-submitter-btn-add'));
 
     expect(addTodo).toHaveBeenCalledWith('new todo');
   });

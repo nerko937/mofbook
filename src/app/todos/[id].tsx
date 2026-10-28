@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   Button,
   KeyboardAvoidingView,
   Platform,
@@ -15,12 +14,12 @@ import type { TodoGroup } from "../../db/schema";
 import { useTodoGroups, useTodoItems, useTodos } from "@/hooks/todos";
 import { groupColors } from "@/groupColors";
 import { Checkbox } from "expo-checkbox";
+import CommonTextSubmitter from "@/components/CommonTextSubmitter";
 
 export default function TodoDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const safeId = Number(id);
 
-  const [newItemName, setNewItemName] = useState("");
   const { fetchedItems, addTodoItem, deleteTodoItems } = useTodoItems(safeId);
   const { fetchedGroups, addTodoGroup } = useTodoGroups(safeId);
 
@@ -30,14 +29,13 @@ export default function TodoDetails() {
   const resolvedSelectedGroup = selectedGroup ?? groups[0];
   const [groupSelectModalOpen, setGroupSelectModalOpen] = useState(false);
 
-  const handleAddItem = async () => {
-    if (!newItemName.trim() || !resolvedSelectedGroup) return;
+  const handleAddItem = async (text: string) => {
+    if (!resolvedSelectedGroup) return;
 
     await addTodoItem({
+      content: text,
       groupId: resolvedSelectedGroup.id,
-      content: newItemName,
     });
-    setNewItemName("");
   };
 
   const handleAddGroup = async () => {
@@ -153,19 +151,7 @@ export default function TodoDetails() {
           </View>
         </Modal>
 
-        <TextInput
-          style={styles.input}
-          testID="todo-item-input"
-          placeholder="Add a new item..."
-          value={newItemName}
-          onChangeText={setNewItemName}
-          onSubmitEditing={handleAddItem}
-        />
-        <Button
-          title="Add"
-          testID="todo-item-btn-add"
-          onPress={handleAddItem}
-        />
+        <CommonTextSubmitter externalHandler={handleAddItem} />
       </View>
 
       <FlatList

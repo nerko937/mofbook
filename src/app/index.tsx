@@ -2,25 +2,16 @@ import {
   FlatList,
   StyleSheet,
   Text,
-  View,
-  TextInput,
-  Button,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
 } from "react-native";
-import { useState } from "react";
 import { Link } from "expo-router";
 import { useTodos } from "@/hooks/todos";
+import CommonTextSubmitter from "@/components/CommonTextSubmitter";
 
 export default function Index() {
-  const [newTodoName, setNewTodoName] = useState("");
   const { fetchedTodos, addTodo } = useTodos();
-
-  const handleAddTodo = async () => {
-    await addTodo(newTodoName);
-    setNewTodoName("");
-  };
 
   return (
     <KeyboardAvoidingView
@@ -49,17 +40,7 @@ export default function Index() {
         )}
       />
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          testID="todo-input"
-          style={styles.input}
-          value={newTodoName}
-          onChangeText={setNewTodoName}
-          onSubmitEditing={handleAddTodo}
-          placeholder="New Todo"
-        />
-        <Button testID="todo-btn-add" title="Add" onPress={handleAddTodo} />
-      </View>
+      <CommonTextSubmitter externalHandler={addTodo} />
     </KeyboardAvoidingView>
   );
 }
