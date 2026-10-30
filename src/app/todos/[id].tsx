@@ -13,8 +13,8 @@ import { useState } from "react";
 import type { TodoGroup } from "../../db/schema";
 import { useTodoGroups, useTodoItems, useTodos } from "@/hooks/todos";
 import { groupColors } from "@/groupColors";
-import { Checkbox } from "expo-checkbox";
 import CommonTextSubmitter from "@/components/CommonTextSubmitter";
+import TodoItemRow from "@/components/TodoItemRow";
 
 export default function TodoDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -48,13 +48,6 @@ export default function TodoDetails() {
   };
 
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
-  const toggleChecked = (itemId: number) => {
-    if (checkedIds.includes(itemId)) {
-      setCheckedIds(checkedIds.filter((id) => id !== itemId));
-    } else {
-      setCheckedIds([...checkedIds, itemId]);
-    }
-  };
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { deleteTodo } = useTodos();
@@ -158,26 +151,11 @@ export default function TodoDetails() {
         data={fetchedItems ?? []}
         keyExtractor={(row) => row.item.id.toString()}
         renderItem={({ item: row }) => (
-          <View style={styles.row}>
-            <Checkbox
-              testID="todo-item-chbox"
-              style={styles.checkbox}
-              value={checkedIds.includes(row.item.id)}
-              onValueChange={() => toggleChecked(row.item.id)}
-            />
-            <Text
-              testID="todo-item-color"
-              style={{
-                color: groupColors[row.group.position - 1],
-                fontSize: 20,
-              }}
-            >
-              ■{" "}
-            </Text>
-            <Text testID="todo-item-content" style={styles.text}>
-              {row.item.content}
-            </Text>
-          </View>
+          <TodoItemRow
+            row={row}
+            checkedIds={checkedIds}
+            setCheckedIds={setCheckedIds}
+          />
         )}
       />
     </KeyboardAvoidingView>
@@ -215,33 +193,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
   },
-  checkbox: {
-    marginRight: 10,
-  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
     marginTop: 10,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    fontSize: 16,
-    marginHorizontal: 10,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  text: {
-    fontSize: 16,
   },
 });
