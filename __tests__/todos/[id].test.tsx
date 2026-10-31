@@ -39,13 +39,16 @@ describe('<TodoDetails />', () => {
       deleteTodo: jest.fn(),
     });
     mockUseTodoGroups.mockReturnValue({
-      fetchedGroups: [{ id: 1, todoId: 1, position: 1 }, { id: 2, todoId: 1, position: 2 }],
+      fetchedGroups: [
+        { id: 1, todoId: 1, position: 1 },
+        { id: 2, todoId: 1, position: 2 },
+      ],
       addTodoGroup: jest.fn(),
     });
     mockUseTodoItems.mockReturnValue({
       fetchedItems: [],
       addTodoItem: jest.fn(),
-      deleteTodoItems: jest.fn()
+      deleteTodoItems: jest.fn(),
     });
   });
 
@@ -54,7 +57,7 @@ describe('<TodoDetails />', () => {
     mockUseTodoItems.mockReturnValue({
       fetchedItems: [],
       addTodoItem,
-      deleteTodoItems: jest.fn()
+      deleteTodoItems: jest.fn(),
     });
 
     const user = userEvent.setup();
@@ -62,8 +65,8 @@ describe('<TodoDetails />', () => {
     expect(screen.queryAllByTestId('todo-item-content')).toHaveLength(0);
 
     // this should be selected by default, but in test all happens too fast
-    await user.press(screen.getByTestId('group-picker-btn-change'))
-    await user.press(screen.getAllByTestId('group-picker-btn-select')[0])
+    await user.press(screen.getByTestId('group-picker-btn-change'));
+    await user.press(screen.getAllByTestId('group-picker-btn-select')[0]);
 
     await user.type(screen.getByTestId('text-submitter-input'), 'todo 1');
     await user.press(screen.getByTestId('text-submitter-btn-submit'));
@@ -73,8 +76,8 @@ describe('<TodoDetails />', () => {
       content: 'todo 1',
     });
 
-    await user.press(screen.getByTestId('group-picker-btn-change'))
-    await user.press(screen.getAllByTestId('group-picker-btn-select')[1])
+    await user.press(screen.getByTestId('group-picker-btn-change'));
+    await user.press(screen.getAllByTestId('group-picker-btn-select')[1]);
 
     await user.type(screen.getByTestId('text-submitter-input'), 'todo 2');
     await user.press(screen.getByTestId('text-submitter-btn-submit'));
@@ -89,38 +92,38 @@ describe('<TodoDetails />', () => {
     mockUseTodoItems.mockReturnValue({
       fetchedItems: [
         {
-          item: { id: 1, groupId: 1, content: "todo 1", position: 1},
-          group: { id: 1, todoId: 1, position: 1 }
+          item: { id: 1, groupId: 1, content: 'todo 1', position: 1 },
+          group: { id: 1, todoId: 1, position: 1 },
         },
         {
-          item: { id: 2, groupId: 2, content: "todo 2", position: 2},
-          group: { id: 2, todoId: 1, position: 2 }
-        }
+          item: { id: 2, groupId: 2, content: 'todo 2', position: 2 },
+          group: { id: 2, todoId: 1, position: 2 },
+        },
       ],
       addTodoItem: jest.fn(),
-      deleteTodoItems: jest.fn()
+      deleteTodoItems: jest.fn(),
     });
 
     await render(<TodoDetails />);
 
-    const contents = screen.getAllByTestId('todo-item-content')
-    expect(contents).toHaveLength(2)
-    expect(contents[0]).toHaveTextContent('todo 1')
-    expect(contents[1]).toHaveTextContent('todo 2')
+    const contents = screen.getAllByTestId('todo-item-content');
+    expect(contents).toHaveLength(2);
+    expect(contents[0]).toHaveTextContent('todo 1');
+    expect(contents[1]).toHaveTextContent('todo 2');
 
-    const colors = screen.getAllByTestId('todo-item-color')
-    expect(colors).toHaveLength(2)
-    expect(colors[0]).toHaveStyle({color: groupColors[0]})
-    expect(colors[1]).toHaveStyle({color: groupColors[1]})
+    const colors = screen.getAllByTestId('todo-item-color');
+    expect(colors).toHaveLength(2);
+    expect(colors[0]).toHaveStyle({ color: groupColors[0] });
+    expect(colors[1]).toHaveStyle({ color: groupColors[1] });
 
-    const checkboxes = screen.getAllByTestId('todo-item-chbox')
-    expect(checkboxes).toHaveLength(2)
-    expect(checkboxes[0]).not.toBeChecked()
-    expect(checkboxes[1]).not.toBeChecked()
-  })
+    const checkboxes = screen.getAllByTestId('todo-item-chbox');
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[0]).not.toBeChecked();
+    expect(checkboxes[1]).not.toBeChecked();
+  });
 
   test('adding new group', async () => {
-    const addTodoGroup = jest.fn()
+    const addTodoGroup = jest.fn();
     mockUseTodoGroups.mockReturnValue({
       fetchedGroups: [{ id: 1, todoId: 1, position: 1 }],
       addTodoGroup: addTodoGroup,
@@ -132,43 +135,43 @@ describe('<TodoDetails />', () => {
     await user.press(screen.getByTestId('group-picker-btn-change'));
     await user.press(screen.getByTestId('group-picker-btn-add'));
     expect(addTodoGroup).toHaveBeenCalledWith({ todoId: 1, position: 2 });
-  })
+  });
 
   test('deleting todo items', async () => {
-    const deleteTodoItems = jest.fn()
+    const deleteTodoItems = jest.fn();
     mockUseTodoItems.mockReturnValue({
       fetchedItems: [
         {
-          item: { id: 1, groupId: 1, content: "todo 1", position: 1},
-          group: { id: 1, todoId: 1, position: 1 }
+          item: { id: 1, groupId: 1, content: 'todo 1', position: 1 },
+          group: { id: 1, todoId: 1, position: 1 },
         },
         {
-          item: { id: 2, groupId: 2, content: "todo 2", position: 2},
-          group: { id: 2, todoId: 1, position: 2 }
+          item: { id: 2, groupId: 2, content: 'todo 2', position: 2 },
+          group: { id: 2, todoId: 1, position: 2 },
         },
         {
-          item: { id: 3, groupId: 3, content: "todo 3", position: 3},
-          group: { id: 3, todoId: 1, position: 3 }
-        }
+          item: { id: 3, groupId: 3, content: 'todo 3', position: 3 },
+          group: { id: 3, todoId: 1, position: 3 },
+        },
       ],
       addTodoItem: jest.fn(),
-      deleteTodoItems: deleteTodoItems
+      deleteTodoItems: deleteTodoItems,
     });
 
     const user = userEvent.setup();
     await render(<TodoDetails />);
 
-    expect(screen.queryByTestId('delete-items-btn-del-checked')).toBe(null)
+    expect(screen.queryByTestId('delete-items-btn-del-checked')).toBe(null);
 
-    const checkboxes = screen.getAllByTestId('todo-item-chbox')
-    await user.press(checkboxes[0])
-    await user.press(checkboxes[1])
-    await user.press(screen.getByTestId('delete-items-btn-del-checked'))
-    expect(deleteTodoItems).toHaveBeenCalledWith([1, 2])
-  })
+    const checkboxes = screen.getAllByTestId('todo-item-chbox');
+    await user.press(checkboxes[0]);
+    await user.press(checkboxes[1]);
+    await user.press(screen.getByTestId('delete-items-btn-del-checked'));
+    expect(deleteTodoItems).toHaveBeenCalledWith([1, 2]);
+  });
 
   test('delete todo', async () => {
-    const deleteTodo = jest.fn()
+    const deleteTodo = jest.fn();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
       getTodo: jest.fn().mockResolvedValue({
@@ -188,9 +191,9 @@ describe('<TodoDetails />', () => {
     await user.press(screen.getByTestId('confirmation-modal-btn-dismiss'))
     expect(deleteTodo).not.toHaveBeenCalled()
 
-    await user.press(openDeleteModal)
-    await user.press(screen.getByTestId('confirmation-modal-btn-confirm'))
-    expect(deleteTodo).toHaveBeenCalledWith(1)
-    expect(router.replace).toHaveBeenCalledWith('/')
-  })
-})
+    await user.press(openDeleteModal);
+    await user.press(screen.getByTestId('confirmation-modal-btn-confirm'));
+    expect(deleteTodo).toHaveBeenCalledWith(1);
+    expect(screen).toHavePathname('/');
+  });
+});
