@@ -5,7 +5,7 @@ type CommonSubmitterProps = {
   externalHandler: (text: string) => void;
 };
 
-const CommonTextSubmitter = ({ externalHandler }: CommonSubmitterProps) => {
+const TextSubmitter = ({ externalHandler }: CommonSubmitterProps) => {
   const [text, setText] = useState("");
 
   const internalHandler = () => {
@@ -18,7 +18,7 @@ const CommonTextSubmitter = ({ externalHandler }: CommonSubmitterProps) => {
   return (
     <View style={styles.inputContainer}>
       <TextInput
-        testID="common-submitter-input"
+        testID="text-submitter-input"
         style={styles.input}
         value={text}
         onChangeText={setText}
@@ -26,7 +26,7 @@ const CommonTextSubmitter = ({ externalHandler }: CommonSubmitterProps) => {
         placeholder="New Todo"
       />
       <Button
-        testID="common-submitter-btn-add"
+        testID="text-submitter-btn-submit"
         title="Add"
         onPress={internalHandler}
       />
@@ -52,4 +52,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CommonTextSubmitter;
+export default TextSubmitter;

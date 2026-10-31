@@ -53,8 +53,8 @@ describe('<TodoDetails />', () => {
     await render(<TodoDetails />);
     expect(screen.queryAllByTestId('todo-item-content')).toHaveLength(0);
 
-    await user.type(screen.getByTestId('common-submitter-input'), 'todo 1');
-    await user.press(screen.getByTestId('common-submitter-btn-add'));
+    await user.type(screen.getByTestId('text-submitter-input'), 'todo 1');
+    await user.press(screen.getByTestId('text-submitter-btn-submit'));
 
     expect(addTodoItem).toHaveBeenCalledWith({
       groupId: 1,
@@ -64,8 +64,8 @@ describe('<TodoDetails />', () => {
     await user.press(screen.getByTestId('todo-group-btn-change'))
     await user.press(screen.getAllByTestId('todo-group-btn-select')[1])
 
-    await user.type(screen.getByTestId('common-submitter-input'), 'todo 2');
-    await user.press(screen.getByTestId('common-submitter-btn-add'));
+    await user.type(screen.getByTestId('text-submitter-input'), 'todo 2');
+    await user.press(screen.getByTestId('text-submitter-btn-submit'));
 
     expect(addTodoItem).toHaveBeenCalledWith({
       groupId: 2,
@@ -168,11 +168,11 @@ describe('<TodoDetails />', () => {
 
     const openDeleteModal = screen.getByTestId('delete-todo-btn-modal-opn')
     await user.press(openDeleteModal)
-    await user.press(screen.getByTestId('delete-todo-btn-dismiss'))
+    await user.press(screen.getByTestId('confirmation-modal-btn-dismiss'))
     expect(deleteTodo).not.toHaveBeenCalled()
 
     await user.press(openDeleteModal)
-    await user.press(screen.getByTestId('delete-todo-btn-confirmation'))
+    await user.press(screen.getByTestId('confirmation-modal-btn-confirm'))
     expect(deleteTodo).toHaveBeenCalledWith(1)
     expect(router.replace).toHaveBeenCalledWith('/')
   })

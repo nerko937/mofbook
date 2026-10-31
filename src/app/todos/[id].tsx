@@ -13,8 +13,9 @@ import { useState } from "react";
 import type { TodoGroup } from "../../db/schema";
 import { useTodoGroups, useTodoItems, useTodos } from "@/hooks/todos";
 import { groupColors } from "@/groupColors";
-import CommonTextSubmitter from "@/components/CommonTextSubmitter";
+import TextSubmitter from "@/components/ui/TextSubmitter";
 import TodoItemRow from "@/components/TodoItemRow";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 export default function TodoDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -63,33 +64,6 @@ export default function TodoDetails() {
         color="red"
         onPress={() => setDeleteModalOpen(true)}
       />
-      <Modal
-        transparent={true}
-        visible={deleteModalOpen}
-        onRequestClose={() => setDeleteModalOpen(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Are you sure?</Text>
-            <Button
-              testID="delete-todo-btn-confirmation"
-              title="Yes, Delete"
-              color="red"
-              onPress={async () => {
-                await deleteTodo(safeId);
-                setDeleteModalOpen(false);
-                router.replace("/");
-              }}
-            />
-            <Button
-              testID="delete-todo-btn-dismiss"
-              title="Cancel"
-              onPress={() => setDeleteModalOpen(false)}
-            />
-          </View>
-        </View>
-      </Modal>
-
       {checkedIds.length > 0 && (
         <View style={styles.selectionBar}>
           <Text>Selected items: {checkedIds.length}</Text>
@@ -144,7 +118,7 @@ export default function TodoDetails() {
           </View>
         </Modal>
 
-        <CommonTextSubmitter externalHandler={handleAddItem} />
+        <TextSubmitter externalHandler={handleAddItem} />
       </View>
 
       <FlatList
@@ -157,6 +131,16 @@ export default function TodoDetails() {
             setCheckedIds={setCheckedIds}
           />
         )}
+      />
+
+      <ConfirmationModal
+        visible={deleteModalOpen}
+        onConfirmation={async () => {
+          await deleteTodo(safeId);
+          setDeleteModalOpen(false);
+          router.replace("/");
+        }}
+        onDismiss={() => setDeleteModalOpen(false)}
       />
     </KeyboardAvoidingView>
   );

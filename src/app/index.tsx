@@ -6,7 +6,7 @@ import {
   Platform,
 } from "react-native";
 import { useTodos } from "@/hooks/todos";
-import CommonTextSubmitter from "@/components/CommonTextSubmitter";
+import CommonTextSubmitter from "@/components/ui/TextSubmitter";
 import TodoRow from "@/components/TodoRow";
 
 export default function Index() {
