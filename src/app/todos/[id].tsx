@@ -7,8 +7,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { useState, useEffect } from "react";
 import type { TodoGroup } from "../../db/schema";
 import { useTodoItems, useTodos } from "@/hooks/todos";
 import TextSubmitter from "@/components/ui/TextSubmitter";
@@ -20,9 +20,23 @@ export default function TodoDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const safeId = Number(id);
 
+  const navigation = useNavigation();
+  const { getTodo, deleteTodo } = useTodos();
   const { fetchedItems, addTodoItem, deleteTodoItems } = useTodoItems(safeId);
 
   const [selectedGroup, setSelectedGroup] = useState<TodoGroup | undefined>();
+  const [checkedIds, setCheckedIds] = useState<number[]>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  useEffect(() => {
+    void (async () => {
+      const todo = await getTodo(safeId);
+      if (!todo) throw new Error("Todo not exist.");
+      navigation.setOptions({
+        headerTitle: todo.name,
+      });
+    })();
+  }, [safeId, navigation, getTodo]);
 
   const handleAddItem = async (text: string) => {
     if (!selectedGroup) return;
@@ -32,11 +46,6 @@ export default function TodoDetails() {
       groupId: selectedGroup.id,
     });
   };
-
-  const [checkedIds, setCheckedIds] = useState<number[]>([]);
-
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const { deleteTodo } = useTodos();
 
   return (
     <KeyboardAvoidingView

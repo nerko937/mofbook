@@ -13,6 +13,7 @@ describe('<Index />', () => {
   beforeEach(() => {
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
+      getTodo: jest.fn(),
       addTodo: jest.fn(),
       deleteTodo: jest.fn(),
     });
@@ -22,6 +23,7 @@ describe('<Index />', () => {
     const addTodo = jest.fn();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
+      getTodo: jest.fn(),
       addTodo,
       deleteTodo: jest.fn(),
     });
@@ -40,6 +42,7 @@ describe('<Index />', () => {
     const todo = { id: 42, name: 'new todo', createdAt: '2026-01-01' };
     mockUseTodos.mockReturnValue({
       fetchedTodos: [todo],
+      getTodo: jest.fn(),
       addTodo: jest.fn(),
       deleteTodo: jest.fn(),
     });

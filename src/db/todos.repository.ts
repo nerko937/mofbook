@@ -6,6 +6,15 @@ export function getTodosQuery() {
   return db.select().from(todos).orderBy(todos.createdAt);
 }
 
+export async function getTodoQuery(todoId: number) {
+  const [user] = await db
+    .select()
+    .from(todos)
+    .where(eq(todos.id, todoId))
+    .limit(1);
+  return user;
+}
+
 export async function addTodo(name: string) {
   await db.transaction(async (tx) => {
     const [{ id }] = await tx

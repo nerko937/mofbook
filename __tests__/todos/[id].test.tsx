@@ -6,6 +6,9 @@ import { router } from 'expo-router';
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({ id: '1' })),
+  useNavigation: jest.fn(() => ({
+    setOptions: jest.fn(),
+  })),
   router: {
     replace: jest.fn(),
   },
@@ -27,6 +30,11 @@ describe('<TodoDetails />', () => {
     jest.mocked(router.replace).mockClear();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
+      getTodo: jest.fn().mockResolvedValue({
+        id: 1,
+        name: 'Test todo',
+        createdAt: '2026-01-01',
+      }),
       addTodo: jest.fn(),
       deleteTodo: jest.fn(),
     });
@@ -163,6 +171,11 @@ describe('<TodoDetails />', () => {
     const deleteTodo = jest.fn()
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
+      getTodo: jest.fn().mockResolvedValue({
+        id: 1,
+        name: 'Test todo',
+        createdAt: '2026-01-01',
+      }),
       addTodo: jest.fn(),
       deleteTodo: deleteTodo,
     });

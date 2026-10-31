@@ -7,6 +7,7 @@ import {
   getTodoGroupsQuery,
   getTodoItemsQuery,
   getTodosQuery,
+  getTodoQuery,
   deleteTodoItems,
   deleteTodo,
 } from "@/db/todos.repository";
@@ -16,6 +17,7 @@ export function useTodos() {
 
   return {
     fetchedTodos,
+    getTodo: getTodoQuery,
     addTodo,
     deleteTodo,
   };
