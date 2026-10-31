@@ -52,10 +52,6 @@ describe('<TodoDetails />', () => {
     await renderApp('/todos/1');
     expect(screen.queryAllByTestId('todo-item-content')).toHaveLength(0);
 
-    // this should be selected by default, but in test all happens too fast
-    await user.press(screen.getByTestId('group-picker-btn-change'));
-    await user.press(screen.getAllByTestId('group-picker-btn-select')[0]);
-
     await user.type(screen.getByTestId('text-submitter-input'), 'todo 1');
     await user.press(screen.getByTestId('text-submitter-btn-submit'));
 
