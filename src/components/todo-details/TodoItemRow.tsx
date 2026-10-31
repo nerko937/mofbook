@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Checkbox } from "expo-checkbox";
 import { TodoGroup, TodoItem } from "@/db/schema";
-import { groupColors } from "@/groupColors";
+import { groupColors } from "@/group-colors";
 
 type TodoItemRowProps = {
   row: { item: TodoItem; group: TodoGroup };

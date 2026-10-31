@@ -12,9 +12,9 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import type { TodoGroup } from "../../db/schema";
 import { useTodoGroups, useTodoItems, useTodos } from "@/hooks/todos";
-import { groupColors } from "@/groupColors";
+import { groupColors } from "@/group-colors";
 import TextSubmitter from "@/components/ui/TextSubmitter";
-import TodoItemRow from "@/components/TodoItemRow";
+import TodoItemRow from "@/components/todo-details/TodoItemRow";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 export default function TodoDetails() {

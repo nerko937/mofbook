@@ -6,8 +6,8 @@ import {
   Platform,
 } from "react-native";
 import { useTodos } from "@/hooks/todos";
-import CommonTextSubmitter from "@/components/ui/TextSubmitter";
-import TodoRow from "@/components/TodoRow";
+import TextSubmitter from "@/components/ui/TextSubmitter";
+import TodoRow from "@/components/index/TodoRow";
 
 export default function Index() {
   const { fetchedTodos, addTodo } = useTodos();
@@ -23,7 +23,7 @@ export default function Index() {
         keyExtractor={(todo) => todo.id.toString()}
         renderItem={({ item: todo }) => <TodoRow todo={todo} />}
       />
-      <CommonTextSubmitter externalHandler={addTodo} />
+      <TextSubmitter externalHandler={addTodo} />
     </KeyboardAvoidingView>
   );
 }

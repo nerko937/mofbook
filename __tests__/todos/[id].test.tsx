@@ -1,7 +1,7 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
 import TodoDetails from '@/app/todos/[id]';
-import { groupColors } from '@/groupColors'
+import { groupColors } from '@/group-colors'
 import { router } from 'expo-router';
 
 jest.mock('expo-router', () => ({
