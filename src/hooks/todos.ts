@@ -1,9 +1,8 @@
-import { useRef } from "react";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import {
   addTodo,
   addTodoGroup,
-  addTodoItem as addTodoItemToDb,
+  addTodoItem,
   getTodoGroupsQuery,
   getTodoItemsQuery,
   getTodosQuery,
@@ -38,18 +37,6 @@ export function useTodoItems(todoId: number) {
   const { data: fetchedItems } = useLiveQuery(getTodoItemsQuery(todoId), [
     todoId,
   ]);
-
-  const addingRef = useRef(false);
-
-  const addTodoItem = async (input: { groupId: number; content: string }) => {
-    if (addingRef.current) return;
-    addingRef.current = true;
-    try {
-      await addTodoItemToDb(input);
-    } finally {
-      addingRef.current = false;
-    }
-  };
 
   return {
     fetchedItems,
