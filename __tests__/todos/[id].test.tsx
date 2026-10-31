@@ -53,6 +53,10 @@ describe('<TodoDetails />', () => {
     await render(<TodoDetails />);
     expect(screen.queryAllByTestId('todo-item-content')).toHaveLength(0);
 
+    // this should be selected by default, but in test all happens too fast
+    await user.press(screen.getByTestId('group-picker-btn-change'))
+    await user.press(screen.getAllByTestId('group-picker-btn-select')[0])
+
     await user.type(screen.getByTestId('text-submitter-input'), 'todo 1');
     await user.press(screen.getByTestId('text-submitter-btn-submit'));
 
@@ -61,8 +65,8 @@ describe('<TodoDetails />', () => {
       content: 'todo 1',
     });
 
-    await user.press(screen.getByTestId('todo-group-btn-change'))
-    await user.press(screen.getAllByTestId('todo-group-btn-select')[1])
+    await user.press(screen.getByTestId('group-picker-btn-change'))
+    await user.press(screen.getAllByTestId('group-picker-btn-select')[1])
 
     await user.type(screen.getByTestId('text-submitter-input'), 'todo 2');
     await user.press(screen.getByTestId('text-submitter-btn-submit'));
@@ -117,8 +121,8 @@ describe('<TodoDetails />', () => {
     const user = userEvent.setup();
     await render(<TodoDetails />);
 
-    await user.press(screen.getByTestId('todo-group-btn-change'));
-    await user.press(screen.getByTestId('todo-group-btn-add'));
+    await user.press(screen.getByTestId('group-picker-btn-change'));
+    await user.press(screen.getByTestId('group-picker-btn-add'));
     expect(addTodoGroup).toHaveBeenCalledWith({ todoId: 1, position: 2 });
   })
 
