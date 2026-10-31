@@ -34,6 +34,14 @@ export default function TodoDetails() {
       if (!todo) throw new Error("Todo not exist.");
       navigation.setOptions({
         headerTitle: todo.name,
+        headerRight: () => (
+          <Button
+            testID="delete-todo-btn-modal-opn"
+            title="Delete whole todo"
+            color="red"
+            onPress={() => setDeleteModalOpen(true)}
+          />
+        ),
       });
     })();
   }, [safeId, navigation, getTodo]);
@@ -52,12 +60,6 @@ export default function TodoDetails() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Button
-        testID="delete-todo-btn-modal-opn"
-        title="Delete whole todo"
-        color="red"
-        onPress={() => setDeleteModalOpen(true)}
-      />
       {checkedIds.length > 0 && (
         <View style={styles.selectionBar}>
           <Text>Selected items: {checkedIds.length}</Text>

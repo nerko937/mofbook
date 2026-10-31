@@ -60,6 +60,9 @@
     "preset": "jest-expo",
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "/__tests__/helpers/"
     ]
   },
   "private": true

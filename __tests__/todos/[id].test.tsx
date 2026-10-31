@@ -1,18 +1,7 @@
-import { render, screen, userEvent } from '@testing-library/react-native';
+import { screen, waitFor } from 'expo-router/testing-library';
 import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
-import TodoDetails from '@/app/todos/[id]';
-import { groupColors } from '@/group-colors'
-import { router } from 'expo-router';
-
-jest.mock('expo-router', () => ({
-  useLocalSearchParams: jest.fn(() => ({ id: '1' })),
-  useNavigation: jest.fn(() => ({
-    setOptions: jest.fn(),
-  })),
-  router: {
-    replace: jest.fn(),
-  },
-}));
+import { groupColors } from '@/group-colors';
+import { renderApp, setupUser } from '../helpers/router';
 
 jest.mock('@/hooks/todos', () => ({
   useTodos: jest.fn(),
@@ -20,14 +9,13 @@ jest.mock('@/hooks/todos', () => ({
   useTodoItems: jest.fn(),
 }));
 
-const mockUseTodos = jest.mocked(useTodos)
+const mockUseTodos = jest.mocked(useTodos);
 const mockUseTodoGroups = jest.mocked(useTodoGroups);
 const mockUseTodoItems = jest.mocked(useTodoItems);
 
 describe('<TodoDetails />', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.mocked(router.replace).mockClear();
+    jest.clearAllMocks();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
       getTodo: jest.fn().mockResolvedValue({
@@ -60,8 +48,8 @@ describe('<TodoDetails />', () => {
       deleteTodoItems: jest.fn(),
     });
 
-    const user = userEvent.setup();
-    await render(<TodoDetails />);
+    const user = setupUser();
+    await renderApp('/todos/1');
     expect(screen.queryAllByTestId('todo-item-content')).toHaveLength(0);
 
     // this should be selected by default, but in test all happens too fast
@@ -104,7 +92,7 @@ describe('<TodoDetails />', () => {
       deleteTodoItems: jest.fn(),
     });
 
-    await render(<TodoDetails />);
+    await renderApp('/todos/1');
 
     const contents = screen.getAllByTestId('todo-item-content');
     expect(contents).toHaveLength(2);
@@ -129,8 +117,8 @@ describe('<TodoDetails />', () => {
       addTodoGroup: addTodoGroup,
     });
 
-    const user = userEvent.setup();
-    await render(<TodoDetails />);
+    const user = setupUser();
+    await renderApp('/todos/1');
 
     await user.press(screen.getByTestId('group-picker-btn-change'));
     await user.press(screen.getByTestId('group-picker-btn-add'));
@@ -158,8 +146,8 @@ describe('<TodoDetails />', () => {
       deleteTodoItems: deleteTodoItems,
     });
 
-    const user = userEvent.setup();
-    await render(<TodoDetails />);
+    const user = setupUser();
+    await renderApp('/todos/1');
 
     expect(screen.queryByTestId('delete-items-btn-del-checked')).toBe(null);
 
@@ -183,13 +171,15 @@ describe('<TodoDetails />', () => {
       deleteTodo: deleteTodo,
     });
 
-    const user = userEvent.setup()
-    await render(<TodoDetails />)
+    const user = setupUser();
+    await renderApp('/todos/1');
 
-    const openDeleteModal = screen.getByTestId('delete-todo-btn-modal-opn')
-    await user.press(openDeleteModal)
-    await user.press(screen.getByTestId('confirmation-modal-btn-dismiss'))
-    expect(deleteTodo).not.toHaveBeenCalled()
+    const openDeleteModal = await waitFor(() =>
+      screen.getByTestId('delete-todo-btn-modal-opn'),
+    );
+    await user.press(openDeleteModal);
+    await user.press(screen.getByTestId('confirmation-modal-btn-dismiss'));
+    expect(deleteTodo).not.toHaveBeenCalled();
 
     await user.press(openDeleteModal);
     await user.press(screen.getByTestId('confirmation-modal-btn-confirm'));
