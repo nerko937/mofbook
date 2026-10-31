@@ -64,16 +64,15 @@ export default function TodoDetails() {
         </View>
       )}
 
-      <View style={styles.inputContainer}>
-        <GroupPicker
-          todoId={safeId}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-        />
-        <TextSubmitter externalHandler={handleAddItem} />
-      </View>
+      <GroupPicker
+        todoId={safeId}
+        selectedGroup={selectedGroup}
+        setSelectedGroup={setSelectedGroup}
+      />
+      <TextSubmitter externalHandler={handleAddItem} />
 
       <FlatList
+        style={styles.list}
         data={fetchedItems ?? []}
         keyExtractor={(row) => row.item.id.toString()}
         renderItem={({ item: row }) => (
@@ -116,10 +115,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
   },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-    marginTop: 10,
+  list: {
+    flex: 1,
   },
 });

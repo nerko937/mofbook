@@ -19,7 +19,8 @@ export default function Index() {
     >
       <Text style={styles.header}>Todos</Text>
       <FlatList
-        data={fetchedTodos}
+        style={styles.list}
+        data={fetchedTodos ?? []}
         keyExtractor={(todo) => todo.id.toString()}
         renderItem={({ item: todo }) => <TodoRow todo={todo} />}
       />
@@ -39,5 +40,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  list: {
+    flex: 1,
   },
 });

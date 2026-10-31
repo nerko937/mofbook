@@ -2,16 +2,16 @@ import { StyleSheet, View, TextInput, Button } from "react-native";
 import { useState } from "react";
 
 type CommonSubmitterProps = {
-  externalHandler: (text: string) => void;
+  externalHandler: (text: string) => Promise<void>;
 };
 
 const TextSubmitter = ({ externalHandler }: CommonSubmitterProps) => {
   const [text, setText] = useState("");
 
-  const internalHandler = () => {
+  const internalHandler = async () => {
     const trimmed = text.trim();
     if (!trimmed) return;
-    externalHandler(trimmed);
+    await externalHandler(trimmed);
     setText("");
   };
 

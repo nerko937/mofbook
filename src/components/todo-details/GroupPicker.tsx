@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { StyleSheet, View, Button, Modal } from "react-native";
 import { TodoGroup } from "@/db/schema";
 import { groupColors } from "@/group-colors";
@@ -19,7 +19,13 @@ const GroupPicker = ({
 
   const { fetchedGroups, addTodoGroup } = useTodoGroups(todoId);
 
+  useEffect(() => {
+    if (!fetchedGroups?.length) return;
+    setSelectedGroup(fetchedGroups[0]);
+  }, [fetchedGroups, setSelectedGroup]);
+
   const handleAddGroup = async () => {
+    if (!fetchedGroups) return;
     if (fetchedGroups.length >= 10) return;
     const newGroup = await addTodoGroup({
       todoId: todoId,
@@ -48,7 +54,7 @@ const GroupPicker = ({
               title="Add group"
               onPress={handleAddGroup}
             />
-            {fetchedGroups.map((group) => (
+            {(fetchedGroups ?? []).map((group) => (
               <Button
                 testID="group-picker-btn-select"
                 title={`Switch to Group ${group.position}`}
