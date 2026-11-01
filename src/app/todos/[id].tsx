@@ -1,10 +1,4 @@
-import {
-  FlatList,
-  StyleSheet,
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { FlatList, Button, StyleSheet } from "react-native";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useState, useEffect } from "react";
 import type { TodoGroup } from "../../db/schema";
@@ -71,17 +65,7 @@ export default function TodoDetails() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <GroupPicker
-        todoId={safeId}
-        selectedGroup={selectedGroup}
-        setSelectedGroup={setSelectedGroup}
-      />
-      <TextSubmitter externalHandler={handleAddItem} />
-
+    <>
       <FlatList
         style={styles.list}
         data={fetchedItems ?? []}
@@ -95,6 +79,13 @@ export default function TodoDetails() {
         )}
       />
 
+      <GroupPicker
+        todoId={safeId}
+        selectedGroup={selectedGroup}
+        setSelectedGroup={setSelectedGroup}
+      />
+      <TextSubmitter externalHandler={handleAddItem} />
+
       <ConfirmationModal
         visible={deleteModalOpen}
         onConfirmation={async () => {
@@ -104,22 +95,11 @@ export default function TodoDetails() {
         }}
         onDismiss={() => setDeleteModalOpen(false)}
       />
-    </KeyboardAvoidingView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 60,
-    paddingHorizontal: 20,
-  },
-  modalText: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 10,
-  },
   list: {
     flex: 1,
   },

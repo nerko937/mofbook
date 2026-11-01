@@ -5,6 +5,7 @@ import { Text, View } from "react-native";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "../db/drizzle/migrations";
 import { db } from "@/db/client";
+import ScreenLayout from "@/components/layout/ScreenLayout";
 
 // Prevent the splash screen from auto-hiding while we migrate the database
 SplashScreen.preventAutoHideAsync();
@@ -33,7 +34,9 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
+    <Stack
+      screenLayout={({ children }) => <ScreenLayout>{children}</ScreenLayout>}
+    >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="todos/[id]" />
     </Stack>
