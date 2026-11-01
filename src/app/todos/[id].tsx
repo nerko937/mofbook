@@ -1,8 +1,6 @@
 import {
   FlatList,
   StyleSheet,
-  Text,
-  View,
   Button,
   KeyboardAvoidingView,
   Platform,
@@ -28,23 +26,40 @@ export default function TodoDetails() {
   const [checkedIds, setCheckedIds] = useState<number[]>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
+  const DeleteAllButton = () => (
+    <Button
+      testID="delete-todo-btn-modal-opn"
+      title="Delete whole todo"
+      color="red"
+      onPress={() => setDeleteModalOpen(true)}
+    />
+  );
+
   useEffect(() => {
     void (async () => {
       const todo = await getTodo(safeId);
       if (!todo) throw new Error("Todo not exist.");
+
+      const selectionCount = checkedIds.length;
       navigation.setOptions({
         headerTitle: todo.name,
-        headerRight: () => (
-          <Button
-            testID="delete-todo-btn-modal-opn"
-            title="Delete whole todo"
-            color="red"
-            onPress={() => setDeleteModalOpen(true)}
-          />
-        ),
+        headerRight: () =>
+          selectionCount > 0 ? (
+            <Button
+              testID="delete-items-btn-del-checked"
+              title={`Delete (${selectionCount})`}
+              color="red"
+              onPress={async () => {
+                await deleteTodoItems(checkedIds);
+                setCheckedIds([]);
+              }}
+            />
+          ) : (
+            <DeleteAllButton />
+          ),
       });
     })();
-  }, [safeId, navigation, getTodo]);
+  }, [safeId, checkedIds, navigation, getTodo, deleteTodoItems]);
 
   const handleAddItem = async (text: string) => {
     if (!selectedGroup) return;
@@ -60,21 +75,6 @@ export default function TodoDetails() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      {checkedIds.length > 0 && (
-        <View style={styles.selectionBar}>
-          <Text>Selected items: {checkedIds.length}</Text>
-          <Button
-            testID="delete-items-btn-del-checked"
-            title="Delete Selected"
-            color="red"
-            onPress={async () => {
-              await deleteTodoItems(checkedIds);
-              setCheckedIds([]);
-            }}
-          />
-        </View>
-      )}
-
       <GroupPicker
         todoId={safeId}
         selectedGroup={selectedGroup}
@@ -119,12 +119,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
     marginBottom: 10,
-  },
-  selectionBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
   },
   list: {
     flex: 1,
