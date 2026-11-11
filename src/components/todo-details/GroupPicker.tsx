@@ -21,8 +21,8 @@ const GroupPicker = ({
 
   useEffect(() => {
     if (!fetchedGroups?.length) return;
-    setSelectedGroup(fetchedGroups[0]);
-  }, [fetchedGroups, setSelectedGroup]);
+    if (selectedGroup === undefined) setSelectedGroup(fetchedGroups.at(-1));
+  }, [fetchedGroups, selectedGroup, setSelectedGroup]);
 
   const handleAddGroup = async () => {
     if (!fetchedGroups) return;

@@ -11,14 +11,19 @@ import {
   deleteTodo,
 } from "@/db/todos.repository";
 
+export function useTodo() {
+  return {
+    getTodo: getTodoQuery,
+    deleteTodo,
+  };
+}
+
 export function useTodos() {
-  const { data: fetchedTodos } = useLiveQuery(getTodosQuery());
+  const { data: fetchedTodos } = useLiveQuery(getTodosQuery(), []);
 
   return {
     fetchedTodos,
-    getTodo: getTodoQuery,
     addTodo,
-    deleteTodo,
   };
 }
 

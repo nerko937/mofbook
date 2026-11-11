@@ -1,14 +1,16 @@
 import { screen, waitFor } from 'expo-router/testing-library';
-import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
+import { useTodoGroups, useTodoItems, useTodo, useTodos } from '@/hooks/todos';
 import { groupColors } from '@/group-colors';
 import { renderApp, setupUser } from '../helpers/router';
 
 jest.mock('@/hooks/todos', () => ({
   useTodos: jest.fn(),
+  useTodo: jest.fn(),
   useTodoGroups: jest.fn(),
   useTodoItems: jest.fn(),
 }));
 
+const mockUseTodo = jest.mocked(useTodo);
 const mockUseTodos = jest.mocked(useTodos);
 const mockUseTodoGroups = jest.mocked(useTodoGroups);
 const mockUseTodoItems = jest.mocked(useTodoItems);
@@ -18,12 +20,14 @@ describe('<TodoDetails />', () => {
     jest.clearAllMocks();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
+      addTodo: jest.fn(),
+    });
+    mockUseTodo.mockReturnValue({
       getTodo: jest.fn().mockResolvedValue({
         id: 1,
         name: 'Test todo',
         createdAt: '2026-01-01',
       }),
-      addTodo: jest.fn(),
       deleteTodo: jest.fn(),
     });
     mockUseTodoGroups.mockReturnValue({
@@ -56,18 +60,18 @@ describe('<TodoDetails />', () => {
     await user.press(screen.getByTestId('text-submitter-btn-submit'));
 
     expect(addTodoItem).toHaveBeenCalledWith({
-      groupId: 1,
+      groupId: 2,
       content: 'todo 1',
     });
 
     await user.press(screen.getByTestId('group-picker-btn-change'));
-    await user.press(screen.getAllByTestId('group-picker-btn-select')[1]);
+    await user.press(screen.getAllByTestId('group-picker-btn-select')[0]);
 
     await user.type(screen.getByTestId('text-submitter-input'), 'todo 2');
     await user.press(screen.getByTestId('text-submitter-btn-submit'));
 
     expect(addTodoItem).toHaveBeenCalledWith({
-      groupId: 2,
+      groupId: 1,
       content: 'todo 2',
     });
   });
@@ -156,15 +160,13 @@ describe('<TodoDetails />', () => {
 
   test('delete todo', async () => {
     const deleteTodo = jest.fn();
-    mockUseTodos.mockReturnValue({
-      fetchedTodos: [],
+    mockUseTodo.mockReturnValue({
       getTodo: jest.fn().mockResolvedValue({
         id: 1,
         name: 'Test todo',
         createdAt: '2026-01-01',
       }),
-      addTodo: jest.fn(),
-      deleteTodo: deleteTodo,
+      deleteTodo,
     });
 
     const user = setupUser();

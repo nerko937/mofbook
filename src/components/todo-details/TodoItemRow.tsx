@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import React from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Checkbox } from "expo-checkbox";
 import { TodoGroup, TodoItem } from "@/db/schema";
@@ -6,26 +6,22 @@ import { groupColors } from "@/group-colors";
 
 type TodoItemRowProps = {
   row: { item: TodoItem; group: TodoGroup };
-  checkedIds: number[];
-  setCheckedIds: Dispatch<SetStateAction<number[]>>;
+  isChecked: boolean;
+  onToggle: (id: number) => void;
 };
 
-const TodoItemRow = ({ row, checkedIds, setCheckedIds }: TodoItemRowProps) => {
-  const toggleChecked = () => {
-    if (checkedIds.includes(row.item.id)) {
-      setCheckedIds(checkedIds.filter((id) => id !== row.item.id));
-    } else {
-      setCheckedIds([...checkedIds, row.item.id]);
-    }
-  };
-
+const TodoItemRow = React.memo(function TodoItemRow({
+  row,
+  isChecked,
+  onToggle,
+}: TodoItemRowProps) {
   return (
     <View style={styles.row}>
       <Checkbox
         testID="todo-item-chbox"
         style={styles.checkbox}
-        value={checkedIds.includes(row.item.id)}
-        onValueChange={toggleChecked}
+        value={isChecked}
+        onValueChange={() => onToggle(row.item.id)}
       />
       <Text
         testID="todo-item-color"
@@ -41,7 +37,7 @@ const TodoItemRow = ({ row, checkedIds, setCheckedIds }: TodoItemRowProps) => {
       </Text>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   checkbox: {

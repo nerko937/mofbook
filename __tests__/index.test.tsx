@@ -1,14 +1,16 @@
 import { screen, waitFor } from 'expo-router/testing-library';
-import { useTodoGroups, useTodoItems, useTodos } from '@/hooks/todos';
+import { useTodoGroups, useTodoItems, useTodo, useTodos } from '@/hooks/todos';
 import { renderApp, setupUser } from './helpers/router';
 
 jest.mock('@/hooks/todos', () => ({
   useTodos: jest.fn(),
+  useTodo: jest.fn(),
   useTodoGroups: jest.fn(),
   useTodoItems: jest.fn(),
 }));
 
 const mockUseTodos = jest.mocked(useTodos);
+const mockUseTodo = jest.mocked(useTodo);
 const mockUseTodoGroups = jest.mocked(useTodoGroups);
 const mockUseTodoItems = jest.mocked(useTodoItems);
 
@@ -16,8 +18,10 @@ describe('<Index />', () => {
   beforeEach(() => {
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
-      getTodo: jest.fn(),
       addTodo: jest.fn(),
+    });
+    mockUseTodo.mockReturnValue({
+      getTodo: jest.fn(),
       deleteTodo: jest.fn(),
     });
     mockUseTodoGroups.mockReturnValue({
@@ -35,9 +39,7 @@ describe('<Index />', () => {
     const addTodo = jest.fn();
     mockUseTodos.mockReturnValue({
       fetchedTodos: [],
-      getTodo: jest.fn(),
       addTodo,
-      deleteTodo: jest.fn(),
     });
 
     const user = setupUser();
@@ -54,8 +56,10 @@ describe('<Index />', () => {
     const todo = { id: 42, name: 'new todo', createdAt: '2026-01-01' };
     mockUseTodos.mockReturnValue({
       fetchedTodos: [todo],
-      getTodo: jest.fn().mockResolvedValue(todo),
       addTodo: jest.fn(),
+    });
+    mockUseTodo.mockReturnValue({
+      getTodo: jest.fn().mockResolvedValue(todo),
       deleteTodo: jest.fn(),
     });
 

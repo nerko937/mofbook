@@ -1,4 +1,4 @@
-import { eq, max, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { todos, todoGroups, todoItems, type TodoGroup } from "@/db/schema";
 
@@ -65,15 +65,10 @@ export function getTodoItemsQuery(todoId: number) {
 }
 
 export async function addTodoItem(input: { groupId: number; content: string }) {
-  const [{ maxPos }] = await db
-    .select({ maxPos: max(todoItems.position) })
-    .from(todoItems)
-    .where(eq(todoItems.groupId, input.groupId));
-
   await db.insert(todoItems).values({
     groupId: input.groupId,
     content: input.content,
-    position: (maxPos ?? 0) + 1,
+    position: sql`(SELECT COALESCE(MAX(${todoItems.position}), 0) + 1 FROM ${todoItems} WHERE ${todoItems.groupId} = ${input.groupId})`,
   });
 }
 

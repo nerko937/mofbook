@@ -1,8 +1,9 @@
+import React from "react";
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import { Link } from "expo-router";
 import { Todo } from "@/db/schema";
 
-const TodoRow = ({ todo }: { todo: Todo }) => {
+const TodoRow = React.memo(function TodoRow({ todo }: { todo: Todo }) {
   return (
     <Link
       testID="todo-row"
@@ -17,7 +18,7 @@ const TodoRow = ({ todo }: { todo: Todo }) => {
       </TouchableOpacity>
     </Link>
   );
-};
+});
 
 const styles = StyleSheet.create({
   text: {
